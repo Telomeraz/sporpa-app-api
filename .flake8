@@ -4,6 +4,6 @@ max-line-length = 119
 ignore = E203, W503
 exclude = */migrations/*
 per-file-ignores =
-    sporpa/sporpa/settings/local.py:F401,F403,F405
-    sporpa/sporpa/settings/production.py:F401,F403,F405
-    sporpa/sporpa/settings/test.py:F401,F403,F405
+    sporpa/core/settings/local.py:F401,F403,F405
+    sporpa/core/settings/production.py:F401,F403,F405
+    sporpa/core/settings/test.py:F401,F403,F405

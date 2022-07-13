@@ -22,9 +22,9 @@ exclude = [
 ]
 
 [tool.django-stubs]
-django_settings_module = "sporpa"
+django_settings_module = "core"
 
 [tool.pytest.ini_options]
-pythonpath = "."
-DJANGO_SETTINGS_MODULE = "sporpa.settings.test"
+pythonpath = "sporpa"
+DJANGO_SETTINGS_MODULE = "core.settings.test"
 addopts = "--nomigrations --cov=. --cov-report=html"
