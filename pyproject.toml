@@ -1,6 +1,7 @@
 [tool.black]
 line-length = 119
-exclude = '''
+check = true
+force-exclude = '''
 /(
   | migrations
 )/
@@ -10,6 +11,7 @@ exclude = '''
 profile = "black"
 line_length = 119
 skip_glob = "*/migrations/*.py"
+filter_files = true
 known_django = "django"
 known_first_party = "sporpa/"
 sections = "FUTURE,STDLIB,THIRDPARTY,DJANGO,FIRSTPARTY,LOCALFOLDER"

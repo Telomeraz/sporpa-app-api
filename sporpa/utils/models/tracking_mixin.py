@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Any, Optional, Tuple
 
 from django.db import models
 from django.db.models import QuerySet
@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class TrackingManagerMixin(models.Manager):
-    def __init__(self, *args: Tuple, **kwargs: Dict) -> None:
+    def __init__(self, *args: Tuple, **kwargs: Optional[Any]) -> None:
         self.all_objects = kwargs.pop("all_objects", False)
         super().__init__(*args, **kwargs)
 
