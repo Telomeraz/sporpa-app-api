@@ -17,12 +17,13 @@ sections = "FUTURE,STDLIB,THIRDPARTY,DJANGO,FIRSTPARTY,LOCALFOLDER"
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
 ignore_missing_imports = true
+disallow_untyped_defs = true
 exclude = [
     'local\.py$',
 ]
 
 [tool.django-stubs]
-django_settings_module = "core"
+django_settings_module = "sporpa"
 
 [tool.pytest.ini_options]
 pythonpath = "sporpa"
