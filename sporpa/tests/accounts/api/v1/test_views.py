@@ -11,8 +11,8 @@ pytestmark = pytest.mark.django_db
 factory = APIRequestFactory()
 
 
-class TestAuthToken:
-    def test_auth_token(self, user: User) -> None:
+class TestAuthTokenView:
+    def test_auth_token_view(self, user: User) -> None:
         body = {
             "email": user.email,
             "password": "testpassword",
@@ -22,7 +22,7 @@ class TestAuthToken:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["token"] == user.auth_token.key
 
-    def test_auth_token_when_no_password(self) -> None:
+    def test_auth_token_view_when_no_password(self) -> None:
         body = {
             "email": "qweasd@example.com",
         }
@@ -30,7 +30,7 @@ class TestAuthToken:
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_auth_token_auth_fail(self) -> None:
+    def test_auth_token_view_user_doesnt_exist(self) -> None:
         body = {
             "email": "qweasd@example.com",
             "password": "qweasd",
@@ -39,7 +39,7 @@ class TestAuthToken:
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_auth_token_auth_fail_when_user_is_passive(self, passive_user: User) -> None:
+    def test_auth_token_view_when_user_is_passive(self, passive_user: User) -> None:
         body = {
             "email": passive_user.email,
             "password": "testpassword",
