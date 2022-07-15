@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, List
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -16,7 +16,7 @@ class UserManager(BaseUserManager, TrackingManagerMixin):
         self,
         email: str,
         password: str,
-        **extra_fields: Optional[Any],
+        **extra_fields: Any,
     ) -> "User":
         """
         Creates and saves a User with the given email and password.
@@ -33,7 +33,7 @@ class UserManager(BaseUserManager, TrackingManagerMixin):
         self,
         email: str,
         password: str,
-        **extra_fields: Optional[Any],
+        **extra_fields: Any,
     ) -> "User":
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
@@ -42,7 +42,7 @@ class UserManager(BaseUserManager, TrackingManagerMixin):
         self,
         email: str,
         password: str,
-        **extra_fields: Optional[Any],
+        **extra_fields: Any,
     ) -> "User":
         extra_fields.setdefault("is_superuser", True)
 
@@ -131,7 +131,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
         self,
         subject: str,
         message: str,
-        from_email: Optional[str] = None,
+        from_email: str = None,
         **kwargs: Any,
     ) -> None:
         """Send an email to this user."""
