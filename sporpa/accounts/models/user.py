@@ -108,7 +108,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
         blank=True,
     )
 
-    objects = UserManager()
+    objects: UserManager = UserManager()
     all_objects = UserManager(all_objects=True)
 
     class Meta:
