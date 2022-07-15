@@ -32,5 +32,8 @@ class TrackingMixin(models.Model):
         blank=True,
     )
 
+    objects = TrackingManagerMixin()
+    all_objects = TrackingManagerMixin(all_objects=True)
+
     class Meta:
         abstract = True
