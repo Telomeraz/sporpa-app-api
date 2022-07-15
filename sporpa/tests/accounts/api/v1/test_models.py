@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from accounts.models import User
+from accounts.models import User, user_directory_path
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -37,3 +37,9 @@ class TestUserManager:
         with pytest.raises(ValueError):
             User.objects.create_superuser(email=fake.email(), password=fake.password(), is_superuser=False)
             assert True
+
+
+@pytest.mark.parametrize("filename", [fake.file_name("image")])
+def test_user_directory_path(user: User, filename: str) -> None:
+    path = user_directory_path(user, filename)
+    assert path == f"avatars/user_{user.pk}/{filename}"

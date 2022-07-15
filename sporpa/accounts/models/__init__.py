@@ -1,3 +1,3 @@
-from .user import User
+from .user import User, user_directory_path
 
-__all__ = ["User"]
+__all__ = ["User", "user_directory_path"]
