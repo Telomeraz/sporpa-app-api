@@ -8,7 +8,7 @@ from accounts.api.v1.views import AuthTokenView
 from accounts.models import User
 
 pytestmark = pytest.mark.django_db
-factory = APIRequestFactory()
+request_factory = APIRequestFactory()
 
 
 class TestAuthTokenView:
@@ -17,7 +17,7 @@ class TestAuthTokenView:
             "email": user.email,
             "password": "testpassword",
         }
-        request = factory.post(reverse("api.v1.accounts:auth-token"), data=body)
+        request = request_factory.post(reverse("api.v1.accounts:auth-token"), data=body)
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_200_OK
         assert response.data["token"] == user.auth_token.key
@@ -26,7 +26,7 @@ class TestAuthTokenView:
         body = {
             "email": "qweasd@example.com",
         }
-        request = factory.post(reverse("api.v1.accounts:auth-token"), data=body)
+        request = request_factory.post(reverse("api.v1.accounts:auth-token"), data=body)
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -35,7 +35,7 @@ class TestAuthTokenView:
             "email": "qweasd@example.com",
             "password": "qweasd",
         }
-        request = factory.post(reverse("api.v1.accounts:auth-token"), data=body)
+        request = request_factory.post(reverse("api.v1.accounts:auth-token"), data=body)
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -44,6 +44,6 @@ class TestAuthTokenView:
             "email": passive_user.email,
             "password": "testpassword",
         }
-        request = factory.post(reverse("api.v1.accounts:auth-token"), data=body)
+        request = request_factory.post(reverse("api.v1.accounts:auth-token"), data=body)
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
