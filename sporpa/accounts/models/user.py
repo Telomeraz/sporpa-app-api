@@ -2,7 +2,6 @@ from typing import Any, List
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.core.mail import send_mail
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -126,13 +125,3 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
         Return the first_name plus the last_name, with a space in between.
         """
         return f"{self.first_name} {self.last_name}".strip()
-
-    def email_user(
-        self,
-        subject: str,
-        message: str,
-        from_email: str = None,
-        **kwargs: Any,
-    ) -> None:
-        """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
