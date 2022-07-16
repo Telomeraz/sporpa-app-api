@@ -2,6 +2,7 @@ import pytest
 from faker import Faker
 
 from accounts.models import User, user_directory_path
+from tests.accounts.factories import UserFactory
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -43,3 +44,19 @@ class TestUserManager:
 def test_user_directory_path(user: User, filename: str) -> None:
     path = user_directory_path(user, filename)
     assert path == f"avatars/user_{user.pk}/{filename}"
+
+
+class TestUser:
+    def test_clean(self, user: User) -> None:
+        user.email = "testuser@EXAMPLE.COM"
+        user.clean()
+        assert user.email == "testuser@example.com"
+
+    def test_full_name(self) -> None:
+        user: User = UserFactory.build(
+            email=fake.email(),
+            password=fake.password(),
+            first_name="Adam",
+            last_name="Smith",
+        )
+        assert user.full_name == "Adam Smith"
