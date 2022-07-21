@@ -29,12 +29,12 @@ def TrackingMixinTestModel(django_db_blocker: Any) -> Type[TrackingMixin]:
 
 
 class TestTrackingManagerMixin:
-    def test_tracking_manager_mixin_when_active_record(self, TrackingMixinTestModel: Type[TrackingMixin]) -> None:
+    def test_get_queryset_when_active_record(self, TrackingMixinTestModel: Type[TrackingMixin]) -> None:
         TrackingMixinTestModel.objects.create()
         assert TrackingMixinTestModel.objects.count() == 1
         assert TrackingMixinTestModel.all_objects.count() == 1
 
-    def test_tracking_manager_mixin_when_passive_record(self, TrackingMixinTestModel: Type[TrackingMixin]) -> None:
+    def test_get_queryset_when_passive_record(self, TrackingMixinTestModel: Type[TrackingMixin]) -> None:
         TrackingMixinTestModel.objects.create(deleted_at=timezone.now())
         assert TrackingMixinTestModel.objects.count() == 0
         assert TrackingMixinTestModel.all_objects.count() == 1
