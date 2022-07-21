@@ -53,7 +53,7 @@ class UserManager(BaseUserManager, TrackingManagerMixin):
 
 def user_directory_path(instance: "User", filename: str) -> str:
     # file will be uploaded to MEDIA_ROOT/user_<pk>/<filename>
-    return f"avatars/user_{instance.pk}/{filename}"
+    return f"avatars/user/{instance.email}/{filename}"
 
 
 class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):

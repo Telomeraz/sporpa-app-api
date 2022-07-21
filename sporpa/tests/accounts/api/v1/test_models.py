@@ -43,7 +43,7 @@ class TestUserManager:
 @pytest.mark.parametrize("filename", [fake.file_name("image")])
 def test_user_directory_path(user: User, filename: str) -> None:
     path = user_directory_path(user, filename)
-    assert path == f"avatars/user_{user.pk}/{filename}"
+    assert path == f"avatars/user/{user.email}/{filename}"
 
 
 class TestUser:
