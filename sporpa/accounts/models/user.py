@@ -1,5 +1,7 @@
 from typing import Any, List
 
+from rest_framework.authtoken.models import Token
+
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
@@ -26,6 +28,7 @@ class UserManager(BaseUserManager, TrackingManagerMixin):
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+        Token.objects.create(user=user)
         return user
 
     def create_user(
@@ -66,6 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS: List = []
     username = None
+    auth_token: Token
 
     first_name = models.CharField(
         _("first name"),

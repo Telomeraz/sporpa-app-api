@@ -14,6 +14,7 @@ class TestUserManager:
         assert user.pk is not None
         assert user.is_active is True
         assert User.objects.count() == 1
+        assert user.auth_token.key
 
     def test_create_user_when_empty_email(self) -> None:
         with pytest.raises(ValueError):
