@@ -10,9 +10,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
     password = factory.PostGenerationMethodCall("set_password", "testpassword")
+    avatar = factory.django.ImageField(filename=factory.Faker("file_name", category="image"))
     birthdate = factory.Faker("date_of_birth")
     gender = factory.fuzzy.FuzzyChoice(User.Gender.choices, getter=lambda c: c[0])
-    about = factory.Faker("text", max_nb_chars=600)
+    about = factory.Faker("text", max_nb_chars=User.about.field.max_length)
 
     class Meta:
         model = User
