@@ -40,7 +40,7 @@ class AuthTokenSerializer(serializers.Serializer):
         return attrs
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(
         label=_("Password (again)"),
         style={"input_type": "password"},
@@ -75,3 +75,59 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: Dict) -> User:
         return User.objects.create_user(**validated_data)
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(
+        label=_("Old Password"),
+        style={"input_type": "password"},
+        trim_whitespace=False,
+        write_only=True,
+        required=False,
+    )
+    password2 = serializers.CharField(
+        label=_("Password (again)"),
+        style={"input_type": "password"},
+        trim_whitespace=False,
+        write_only=True,
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "old_password",
+            "password",
+            "password2",
+            "first_name",
+            "last_name",
+            "avatar",
+            "birthdate",
+            "gender",
+            "about",
+        )
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
+
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
+        old_password = attrs.pop("old_password", None)
+        password = attrs.get("password", None)
+        password2 = attrs.pop("password2", None)
+        if old_password and password and password2:
+            if not self.instance.check_password(old_password):
+                msg = _("Password is not valid.")
+                raise serializers.ValidationError(msg, code="invalid")
+            if password != password2:
+                msg = _("Passwords do not match.")
+                raise serializers.ValidationError(msg, code="invalid")
+        else:
+            attrs.pop("password", None)
+        return super().validate(attrs)
+
+    def update(self, instance: User, validated_data: Dict) -> User:
+        password = validated_data.get("password")
+        if password:
+            instance.set_password(password)
+            del validated_data["password"]
+        return super().update(instance, validated_data)

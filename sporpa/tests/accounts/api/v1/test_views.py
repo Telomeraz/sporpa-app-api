@@ -1,11 +1,13 @@
+import tempfile
+
 import pytest
 from faker import Faker
 from rest_framework import status
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
 
-from accounts.api.v1.views import AuthTokenView, RegisterView
+from accounts.api.v1.views import AuthTokenView, RegisterView, UpdateUserView
 from accounts.models import User
 from tests.accounts.factories import UserFactory
 
@@ -88,3 +90,41 @@ class TestRegisterView:
         response = RegisterView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert User.objects.filter(email=user.email).exists() is False
+
+
+class TestUpdateUser:
+    def test_put(self, user: User, image_file: tempfile._TemporaryFileWrapper) -> None:
+        password = fake.password()
+        with open(image_file.name, "rb") as data:
+            body = {
+                "email": fake.email(),
+                "password": password,
+                "password2": password,
+                "first_name": fake.first_name(),
+                "last_name": fake.last_name(),
+                "avatar": data,
+                "birthdate": fake.date_of_birth(),
+                "about": fake.text(max_nb_chars=User.about.field.max_length),
+            }
+            request = request_factory.put(
+                reverse("api.v1.accounts:update-user"),
+                data=body,
+            )
+        force_authenticate(request, user=user)
+        response = UpdateUserView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_patch(self, user: User, image_file: tempfile._TemporaryFileWrapper) -> None:
+        with open(image_file.name, "rb") as data:
+            body = {
+                "avatar": data,
+                "birthdate": fake.date_of_birth(),
+                "about": fake.text(max_nb_chars=User.about.field.max_length),
+            }
+            request = request_factory.patch(
+                reverse("api.v1.accounts:update-user"),
+                data=body,
+            )
+        force_authenticate(request, user=user)
+        response = UpdateUserView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK

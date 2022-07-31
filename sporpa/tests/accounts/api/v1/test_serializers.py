@@ -1,7 +1,7 @@
 import pytest
 from faker import Faker
 
-from accounts.api.v1.serializers import AuthTokenSerializer, UserSerializer
+from accounts.api.v1.serializers import AuthTokenSerializer, UserCreateSerializer, UserUpdateSerializer
 from accounts.models import User
 from tests.accounts.factories import UserFactory
 
@@ -45,7 +45,7 @@ class TestAuthTokenSerializer:
         assert serializer.is_valid() is False
 
 
-class TestUserSerializer:
+class TestUserCreateSerializer:
     def test_validate(self) -> None:
         user = UserFactory.build()
         data = {
@@ -59,7 +59,7 @@ class TestUserSerializer:
             "gender": user.gender,
             "about": user.about,
         }
-        serializer = UserSerializer(data=data)
+        serializer = UserCreateSerializer(data=data)
         assert serializer.is_valid() is True
         assert serializer.validated_data["email"] == user.email
         assert serializer.validated_data["password"] == user.password
@@ -83,7 +83,7 @@ class TestUserSerializer:
             "gender": user.gender,
             "about": user.about,
         }
-        serializer = UserSerializer(data=data)
+        serializer = UserCreateSerializer(data=data)
         assert serializer.is_valid() is False
 
     def test_create(self) -> None:
@@ -99,7 +99,7 @@ class TestUserSerializer:
             "gender": user.gender,
             "about": user.about,
         }
-        serializer = UserSerializer(data=data)
+        serializer = UserCreateSerializer(data=data)
         serializer.is_valid()
         new_user = serializer.save()
         assert new_user.email == user.email
@@ -109,3 +109,64 @@ class TestUserSerializer:
         assert new_user.birthdate == user.birthdate
         assert new_user.gender == user.gender
         assert new_user.about == user.about
+
+
+class TestUserUpdateSerializer:
+    def test_update(self, user: User) -> None:
+        user_factory = UserFactory.build()
+        data = {
+            "email": user_factory.email,
+            "old_password": "testpassword",
+            "password": user_factory.password,
+            "password2": user_factory.password,
+            "first_name": user_factory.first_name,
+            "last_name": user_factory.last_name,
+            "avatar": user_factory.avatar,
+            "birthdate": user_factory.birthdate,
+            "gender": user_factory.gender,
+            "about": user_factory.about,
+        }
+        serializer = UserUpdateSerializer(instance=user, data=data)
+        serializer.is_valid()
+        updated_user = serializer.save()
+        assert updated_user.email == user.email
+        assert updated_user.first_name == user.first_name
+        assert updated_user.last_name == user.last_name
+        assert updated_user.avatar == user.avatar
+        assert updated_user.birthdate == user.birthdate
+        assert updated_user.gender == user.gender
+        assert updated_user.about == user.about
+
+    def test_validate_when_password_is_not_valid(self, user: User) -> None:
+        user_factory = UserFactory.build()
+        data = {
+            "email": user_factory.email,
+            "old_password": fake.password(),
+            "password": user_factory.password,
+            "password2": user_factory.password,
+            "first_name": user_factory.first_name,
+            "last_name": user_factory.last_name,
+            "avatar": user_factory.avatar,
+            "birthdate": user_factory.birthdate,
+            "gender": user_factory.gender,
+            "about": user_factory.about,
+        }
+        serializer = UserUpdateSerializer(instance=user, data=data)
+        assert serializer.is_valid() is False
+
+    def test_validate_when_passwords_do_not_match(self, user: User) -> None:
+        user_factory = UserFactory.build()
+        data = {
+            "email": user_factory.email,
+            "old_password": "testpassword",
+            "password": user_factory.password,
+            "password2": fake.password(),
+            "first_name": user_factory.first_name,
+            "last_name": user_factory.last_name,
+            "avatar": user_factory.avatar,
+            "birthdate": user_factory.birthdate,
+            "gender": user_factory.gender,
+            "about": user_factory.about,
+        }
+        serializer = UserUpdateSerializer(instance=user, data=data)
+        assert serializer.is_valid() is False
