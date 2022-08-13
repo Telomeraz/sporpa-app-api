@@ -91,6 +91,13 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
         default=False,
         help_text=_("Designates whether the user can log into this admin site."),
     )
+    has_verified_email = models.BooleanField(
+        _("verified email"),
+        default=False,
+        help_text=_(
+            "Designates whether this user has verified email address.",
+        ),
+    )
     avatar = models.ImageField(
         upload_to=user_directory_path,
         blank=True,
