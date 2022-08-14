@@ -9,7 +9,7 @@ DEBUG = True
 INSTALLED_APPS += ("django_extensions",)
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     "default": {
