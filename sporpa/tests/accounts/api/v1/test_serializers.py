@@ -44,6 +44,14 @@ class TestAuthTokenSerializer:
         serializer = AuthTokenSerializer(data=data)
         assert serializer.is_valid() is False
 
+    def test_validate_when_user_has_verified_email_is_false(self, unverified_user: User) -> None:
+        data = {
+            "email": unverified_user.email,
+            "password": "testpassword",
+        }
+        serializer = AuthTokenSerializer(data=data)
+        assert serializer.is_valid() is False
+
 
 class TestUserCreateSerializer:
     def test_validate(self) -> None:

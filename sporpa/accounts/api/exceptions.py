@@ -1,10 +1,10 @@
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ValidationError
 
 from django.utils.translation import gettext_lazy as _
 
 
-class NotVerifiedEmail(APIException):
+class NotVerifiedEmail(ValidationError):
     """
     The user has not verified email.
     """
