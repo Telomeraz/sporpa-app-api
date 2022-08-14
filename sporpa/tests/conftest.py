@@ -27,6 +27,11 @@ def passive_user() -> User:
 
 
 @pytest.fixture
+def unverified_user() -> User:
+    return UserFactory(has_verified_email=False)
+
+
+@pytest.fixture
 def image_file() -> tempfile._TemporaryFileWrapper:
     image = Image.open(io.BytesIO(fake.image()))
     tmp_file = tempfile.NamedTemporaryFile(suffix=f".{fake.file_extension('image')}")
