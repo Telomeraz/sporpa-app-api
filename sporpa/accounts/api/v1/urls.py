@@ -20,9 +20,9 @@ urlpatterns = [
         name="update-user",
     ),
     path(
-        "user/send-email-verification/<str:email>/",
+        "user/send-verification-email/<str:email>/",
         SendEmailVerificationView.as_view(),
-        name="send-email-verification",
+        name="send-verification-email",
     ),
     path(
         "user/verify-email/<str:email>/",

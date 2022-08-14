@@ -34,7 +34,7 @@ class SendEmailVerificationView(views.APIView):
         if user.has_verified_email:
             return Response({"detail": _("User has already verified email")}, status=status.HTTP_409_CONFLICT)
 
-        user.send_email_verification(build_absolute_uri=request.build_absolute_uri)
+        user.send_verification_email(url=request.build_absolute_uri())
         return Response({"detail": _("Email verification sent.")})
 
 

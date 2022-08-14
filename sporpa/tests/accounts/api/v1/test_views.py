@@ -140,7 +140,7 @@ class TestSendEmailVerificationView:
     def test_post(self, unverified_user: User) -> None:
         request = request_factory.post(
             reverse(
-                "api.v1.accounts:send-email-verification",
+                "api.v1.accounts:send-verification-email",
                 kwargs={"email": unverified_user.email},
             ),
         )
@@ -151,7 +151,7 @@ class TestSendEmailVerificationView:
         email = fake.email()
         request = request_factory.post(
             reverse(
-                "api.v1.accounts:send-email-verification",
+                "api.v1.accounts:send-verification-email",
                 kwargs={"email": email},
             ),
         )
@@ -161,7 +161,7 @@ class TestSendEmailVerificationView:
     def test_post_when_user_has_verified_email(self, user: User) -> None:
         request = request_factory.post(
             reverse(
-                "api.v1.accounts:send-email-verification",
+                "api.v1.accounts:send-verification-email",
                 kwargs={"email": user.email},
             ),
         )
