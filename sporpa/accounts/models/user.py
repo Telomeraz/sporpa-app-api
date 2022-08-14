@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from rest_framework.authtoken.models import Token
 
@@ -69,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS: List = []
+    REQUIRED_FIELDS: list = []
     username = None
     auth_token: Token
 

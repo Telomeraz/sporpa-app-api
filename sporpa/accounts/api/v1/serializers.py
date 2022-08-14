@@ -1,4 +1,4 @@
-from typing import Dict, OrderedDict
+from collections import OrderedDict
 
 from rest_framework import serializers
 
@@ -74,7 +74,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         del attrs["password2"]
         return super().validate(attrs)
 
-    def create(self, validated_data: Dict) -> User:
+    def create(self, validated_data: dict) -> User:
         return User.objects.create_user(**validated_data)
 
 
@@ -126,7 +126,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             attrs.pop("password", None)
         return super().validate(attrs)
 
-    def update(self, instance: User, validated_data: Dict) -> User:
+    def update(self, instance: User, validated_data: dict) -> User:
         password = validated_data.get("password")
         if password:
             instance.set_password(password)
