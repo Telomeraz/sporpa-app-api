@@ -1,11 +1,18 @@
 import pytest
 from faker import Faker
+from rest_framework.test import APIRequestFactory
+
+from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User, user_directory_path
 from tests.accounts.factories import UserFactory
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
+request_factory = APIRequestFactory()
 
 
 class TestUserManager:
@@ -61,3 +68,53 @@ class TestUser:
             last_name="Smith",
         )
         assert user.full_name == "Adam Smith"
+
+    def test_send_verification_email(self, user: User) -> None:
+        url = request_factory.get(
+            reverse(
+                "api.v1.accounts:send-verification-email",
+                kwargs={"email": user.email},
+            ),
+        ).build_absolute_uri(
+            reverse(
+                "api.v1.accounts:send-verification-email",
+                kwargs={"email": user.email},
+            ),
+        )
+        token = user.make_token()
+
+        subject = _("Sporpa Email Verification")
+        message = _(
+            f"Hi {user.full_name},\n\nYou can verify your email address by clicking on the link below:\n\n"
+            f"{url}?token={token}\n\n"
+            "Thank you,\nThe Sporpa Team"
+        )
+        user.send_verification_email(url=url)
+        assert len(mail.outbox) == 1
+        assert subject == mail.outbox[0].subject
+        assert message == mail.outbox[0].body
+
+    def test_email_user(self, user: User) -> None:
+        subject = _("Test Subject")
+        message = _("Test Message")
+        num_sent = user.email_user(subject=subject, message=message)
+        assert num_sent == 1
+        assert subject == mail.outbox[0].subject
+        assert message == mail.outbox[0].body
+
+    def test_generate_email_verification_address(self, user: User) -> None:
+        fake_url = fake.url()
+        url = user.generate_email_verification_address(fake_url)
+        assert url == f"{fake_url}?token={user.make_token()}"
+
+    def test_make_token(self, user: User) -> None:
+        token = user.make_token()
+        assert token == default_token_generator.make_token(user)
+
+    def test_check_token(self, user: User) -> None:
+        token = user.make_token()
+        assert user.check_token(token) is True
+
+    def test_verify_email(self, unverified_user: User) -> None:
+        unverified_user.verify_email()
+        assert unverified_user.has_verified_email is True
