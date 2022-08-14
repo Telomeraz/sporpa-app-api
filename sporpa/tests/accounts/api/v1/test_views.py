@@ -7,7 +7,13 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
 
-from accounts.api.v1.views import AuthTokenView, RegisterView, UpdateUserView
+from accounts.api.v1.views import (
+    AuthTokenView,
+    RegisterView,
+    SendEmailVerificationView,
+    UpdateUserView,
+    VerifyEmailView,
+)
 from accounts.models import User
 from tests.accounts.factories import UserFactory
 
@@ -35,7 +41,7 @@ class TestAuthTokenView:
         response = AuthTokenView.as_view()(request)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_post_user_doesnt_exist(self) -> None:
+    def test_post_when_user_does_not_exist(self) -> None:
         body = {
             "email": "qweasd@example.com",
             "password": "qweasd",
@@ -128,3 +134,88 @@ class TestUpdateUser:
         force_authenticate(request, user=user)
         response = UpdateUserView.as_view()(request)
         assert response.status_code == status.HTTP_200_OK
+
+
+class TestSendEmailVerificationView:
+    def test_post(self, unverified_user: User) -> None:
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:send-email-verification",
+                kwargs={"email": unverified_user.email},
+            ),
+        )
+        response = SendEmailVerificationView.as_view()(request, unverified_user.email)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_post_when_user_does_not_exist(self) -> None:
+        email = fake.email()
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:send-email-verification",
+                kwargs={"email": email},
+            ),
+        )
+        response = SendEmailVerificationView.as_view()(request, email)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_post_when_user_has_verified_email(self, user: User) -> None:
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:send-email-verification",
+                kwargs={"email": user.email},
+            ),
+        )
+        response = SendEmailVerificationView.as_view()(request, user.email)
+        assert response.status_code == status.HTTP_409_CONFLICT
+
+
+class TestVerifyEmailView:
+    def test_post(self, unverified_user: User) -> None:
+        token = unverified_user.make_token()
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:verify-email",
+                kwargs={"email": unverified_user.email},
+            )
+            + f"?token={token}",
+        )
+        response = VerifyEmailView.as_view()(request, unverified_user.email)
+        unverified_user.refresh_from_db()
+        assert response.status_code == status.HTTP_200_OK
+        assert unverified_user.has_verified_email is True
+
+    def test_post_when_user_has_verified_email(self, user: User) -> None:
+        token = user.make_token()
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:verify-email",
+                kwargs={"email": user.email},
+            )
+            + f"?token={token}",
+        )
+        response = VerifyEmailView.as_view()(request, user.email)
+        assert response.status_code == status.HTTP_409_CONFLICT
+
+    def test_post_when_user_does_not_exist(self) -> None:
+        email = fake.email()
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:verify-email",
+                kwargs={"email": email},
+            ),
+        )
+        response = VerifyEmailView.as_view()(request, email)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_post_when_token_is_wrong(self, unverified_user: User) -> None:
+        unverified_user.make_token()
+        token = fake.password(40)
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:verify-email",
+                kwargs={"email": unverified_user.email},
+            )
+            + f"?token={token}",
+        )
+        response = VerifyEmailView.as_view()(request, unverified_user.email)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
