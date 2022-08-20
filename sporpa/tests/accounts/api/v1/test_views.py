@@ -10,6 +10,7 @@ from django.urls import reverse
 from accounts.api.v1.views import (
     AuthTokenView,
     RegisterView,
+    SendPasswordResetEmailView,
     SendVerificationEmailView,
     UpdateUserView,
     VerifyEmailView,
@@ -219,3 +220,26 @@ class TestVerifyEmailView:
         )
         response = VerifyEmailView.as_view()(request, unverified_user.email)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestSendPasswordResetEmailView:
+    def test_post(self, user: User) -> None:
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:send-password-reset-email",
+                kwargs={"email": user.email},
+            ),
+        )
+        response = SendPasswordResetEmailView.as_view()(request, user.email)
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_post_when_user_does_not_exist(self) -> None:
+        email = fake.email()
+        request = request_factory.post(
+            reverse(
+                "api.v1.accounts:send-password-reset-email",
+                kwargs={"email": email},
+            ),
+        )
+        response = SendPasswordResetEmailView.as_view()(request, email)
+        assert response.status_code == status.HTTP_404_NOT_FOUND

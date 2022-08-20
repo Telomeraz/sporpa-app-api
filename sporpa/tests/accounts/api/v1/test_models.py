@@ -119,3 +119,29 @@ class TestUser:
     def test_verify_email(self, unverified_user: User) -> None:
         unverified_user.verify_email()
         assert unverified_user.has_verified_email is True
+
+    def test_send_password_reset_email(self, user: User) -> None:
+        build_absolute_uri = request_factory.get(
+            reverse(
+                "api.v1.accounts:reset-password",
+                kwargs={"email": user.email},
+            ),
+        ).build_absolute_uri
+        url = build_absolute_uri(
+            reverse(
+                "api.v1.accounts:reset-password",
+                kwargs={"email": user.email},
+            ),
+        )
+        token = user.make_token()
+
+        subject = _("Sporpa Password Reset")
+        message = _(
+            f"Hi {user.full_name},\n\nYou can reset your password by clicking on the link below:\n\n"
+            f"{url}?token={token}\n\n"
+            "Thank you,\nThe Sporpa Team"
+        )
+        user.send_password_reset_email(build_absolute_uri=build_absolute_uri)
+        assert len(mail.outbox) == 1
+        assert subject == mail.outbox[0].subject
+        assert message == mail.outbox[0].body

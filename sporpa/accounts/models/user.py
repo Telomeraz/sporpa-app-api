@@ -166,3 +166,13 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     def verify_email(self) -> None:
         self.has_verified_email = True
         self.save()
+
+    def send_password_reset_email(self, build_absolute_uri: Callable[[str | None], str]) -> int:
+        url = build_absolute_uri(reverse("api.v1.accounts:reset-password", kwargs={"email": self.email}))
+        subject = _("Sporpa Password Reset")
+        message = _(
+            f"Hi {self.full_name},\n\nYou can reset your password by clicking on the link below:\n\n"
+            f"{self.generate_token_link(url=url)}\n\n"
+            "Thank you,\nThe Sporpa Team"
+        )
+        return self.email_user(subject, message, from_email="Sporpa")

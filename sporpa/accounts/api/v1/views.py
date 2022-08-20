@@ -61,3 +61,12 @@ class VerifyEmailView(views.APIView):
 
         user.verify_email()
         return Response({"detail": _("Email verified.")})
+
+
+class SendPasswordResetEmailView(views.APIView):
+    permission_classes = ()
+
+    def post(self, request: Request, email: str) -> Response:
+        user: User = generics.get_object_or_404(User, email=email)
+        user.send_password_reset_email(build_absolute_uri=request.build_absolute_uri)
+        return Response({"detail": _("Password reset email sent.")})
