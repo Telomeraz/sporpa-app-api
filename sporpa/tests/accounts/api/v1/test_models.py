@@ -70,14 +70,15 @@ class TestUser:
         assert user.full_name == "Adam Smith"
 
     def test_send_verification_email(self, user: User) -> None:
-        url = request_factory.get(
+        build_absolute_uri = request_factory.get(
             reverse(
-                "api.v1.accounts:send-verification-email",
+                "api.v1.accounts:verify-email",
                 kwargs={"email": user.email},
             ),
-        ).build_absolute_uri(
+        ).build_absolute_uri
+        url = build_absolute_uri(
             reverse(
-                "api.v1.accounts:send-verification-email",
+                "api.v1.accounts:verify-email",
                 kwargs={"email": user.email},
             ),
         )
@@ -89,7 +90,7 @@ class TestUser:
             f"{url}?token={token}\n\n"
             "Thank you,\nThe Sporpa Team"
         )
-        user.send_verification_email(url=url)
+        user.send_verification_email(build_absolute_uri=build_absolute_uri)
         assert len(mail.outbox) == 1
         assert subject == mail.outbox[0].subject
         assert message == mail.outbox[0].body
@@ -102,9 +103,9 @@ class TestUser:
         assert subject == mail.outbox[0].subject
         assert message == mail.outbox[0].body
 
-    def test_generate_email_verification_address(self, user: User) -> None:
+    def test_generate_token_link(self, user: User) -> None:
         fake_url = fake.url()
-        url = user.generate_email_verification_address(fake_url)
+        url = user.generate_token_link(fake_url)
         assert url == f"{fake_url}?token={user.make_token()}"
 
     def test_make_token(self, user: User) -> None:

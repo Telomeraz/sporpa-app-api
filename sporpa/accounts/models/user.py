@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 
 from rest_framework.authtoken.models import Token
 
@@ -7,6 +7,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from utils.models import TrackingManagerMixin, TrackingMixin
@@ -139,11 +140,12 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
         """
         return f"{self.first_name} {self.last_name}".strip()
 
-    def send_verification_email(self, url: str) -> int:
+    def send_verification_email(self, build_absolute_uri: Callable[[str | None], str]) -> int:
+        url = build_absolute_uri(reverse("api.v1.accounts:verify-email", kwargs={"email": self.email}))
         subject = _("Sporpa Email Verification")
         message = _(
             f"Hi {self.full_name},\n\nYou can verify your email address by clicking on the link below:\n\n"
-            f"{self.generate_email_verification_address(url=url)}\n\n"
+            f"{self.generate_token_link(url=url)}\n\n"
             "Thank you,\nThe Sporpa Team"
         )
         return self.email_user(subject, message, from_email="Sporpa")
@@ -151,7 +153,7 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     def email_user(self, subject: str, message: str, from_email: str | None = None, **kwargs: Any) -> int:
         return send_mail(subject, message, from_email, [self.email], **kwargs)
 
-    def generate_email_verification_address(self, url: str) -> str:
+    def generate_token_link(self, url: str) -> str:
         token = self.make_token()
         return f"{url}?token={token}"
 
