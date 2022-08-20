@@ -132,3 +132,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.set_password(password)
             del validated_data["password"]
         return super().update(instance, validated_data)
+
+
+class VerificationTokenSerializer(serializers.Serializer):
+    token = serializers.CharField(
+        label=_("Token"),
+        write_only=True,
+        required=True,
+    )

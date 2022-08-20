@@ -1,7 +1,12 @@
 import pytest
 from faker import Faker
 
-from accounts.api.v1.serializers import AuthTokenSerializer, UserCreateSerializer, UserUpdateSerializer
+from accounts.api.v1.serializers import (
+    AuthTokenSerializer,
+    UserCreateSerializer,
+    UserUpdateSerializer,
+    VerificationTokenSerializer,
+)
 from accounts.models import User
 from tests.accounts.factories import UserFactory
 
@@ -177,4 +182,20 @@ class TestUserUpdateSerializer:
             "about": user_factory.about,
         }
         serializer = UserUpdateSerializer(instance=user, data=data)
+        assert serializer.is_valid() is False
+
+
+class TestVerificationTokenSerializer:
+    def test_validate(self, user: User) -> None:
+        token = user.make_token()
+        data = {
+            "token": token,
+        }
+        serializer = VerificationTokenSerializer(data=data)
+        assert serializer.is_valid() is True
+        assert serializer.validated_data["token"] == token
+
+    def test_validate_when_no_token(self) -> None:
+        data: dict = {}
+        serializer = VerificationTokenSerializer(data=data)
         assert serializer.is_valid() is False

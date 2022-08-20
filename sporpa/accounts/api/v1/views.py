@@ -5,7 +5,12 @@ from rest_framework.views import Response
 
 from django.utils.translation import gettext as _
 
-from accounts.api.v1.serializers import AuthTokenSerializer, UserCreateSerializer, UserUpdateSerializer
+from accounts.api.v1.serializers import (
+    AuthTokenSerializer,
+    UserCreateSerializer,
+    UserUpdateSerializer,
+    VerificationTokenSerializer,
+)
 from accounts.models import User
 
 
@@ -40,14 +45,17 @@ class SendVerificationEmailView(views.APIView):
 
 class VerifyEmailView(views.APIView):
     permission_classes = ()
+    serializer_class = VerificationTokenSerializer
 
     def post(self, request: Request, email: str) -> Response:
         user: User = generics.get_object_or_404(User, email=email)
-        token = request.query_params.get("token")
+        serializer = self.serializer_class(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
 
         if user.has_verified_email:
             return Response({"detail": _("User has already verified email.")}, status=status.HTTP_409_CONFLICT)
 
+        token = serializer.validated_data["token"]
         if not user.check_token(token):
             return Response({"detail": _("Token is invalid or expired.")}, status=status.HTTP_400_BAD_REQUEST)
 
