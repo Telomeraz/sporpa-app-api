@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import AuthTokenView, RegisterView, SendEmailVerificationView, UpdateUserView, VerifyEmailView
+from .views import AuthTokenView, RegisterView, SendVerificationEmailView, UpdateUserView, VerifyEmailView
 
 app_name = "api.v1.accounts"
 urlpatterns = [
@@ -21,7 +21,7 @@ urlpatterns = [
     ),
     path(
         "user/send-verification-email/<str:email>/",
-        SendEmailVerificationView.as_view(),
+        SendVerificationEmailView.as_view(),
         name="send-verification-email",
     ),
     path(

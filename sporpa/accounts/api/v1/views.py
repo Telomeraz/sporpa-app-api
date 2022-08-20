@@ -25,17 +25,17 @@ class UpdateUserView(generics.UpdateAPIView):
         return self.request.user
 
 
-class SendEmailVerificationView(views.APIView):
+class SendVerificationEmailView(views.APIView):
     permission_classes = ()
 
     def post(self, request: Request, email: str) -> Response:
         user: User = generics.get_object_or_404(User, email=email)
 
         if user.has_verified_email:
-            return Response({"detail": _("User has already verified email")}, status=status.HTTP_409_CONFLICT)
+            return Response({"detail": _("User has already verified email.")}, status=status.HTTP_409_CONFLICT)
 
         user.send_verification_email(url=request.build_absolute_uri())
-        return Response({"detail": _("Email verification sent.")})
+        return Response({"detail": _("Verification email sent.")})
 
 
 class VerifyEmailView(views.APIView):
@@ -46,7 +46,7 @@ class VerifyEmailView(views.APIView):
         token = request.query_params.get("token")
 
         if user.has_verified_email:
-            return Response({"detail": _("User has already verified email")}, status=status.HTTP_409_CONFLICT)
+            return Response({"detail": _("User has already verified email.")}, status=status.HTTP_409_CONFLICT)
 
         if not user.check_token(token):
             return Response({"detail": _("Token is invalid or expired.")}, status=status.HTTP_400_BAD_REQUEST)

@@ -10,7 +10,7 @@ from django.urls import reverse
 from accounts.api.v1.views import (
     AuthTokenView,
     RegisterView,
-    SendEmailVerificationView,
+    SendVerificationEmailView,
     UpdateUserView,
     VerifyEmailView,
 )
@@ -136,7 +136,7 @@ class TestUpdateUser:
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestSendEmailVerificationView:
+class TestSendVerificationEmailView:
     def test_post(self, unverified_user: User) -> None:
         request = request_factory.post(
             reverse(
@@ -144,7 +144,7 @@ class TestSendEmailVerificationView:
                 kwargs={"email": unverified_user.email},
             ),
         )
-        response = SendEmailVerificationView.as_view()(request, unverified_user.email)
+        response = SendVerificationEmailView.as_view()(request, unverified_user.email)
         assert response.status_code == status.HTTP_200_OK
 
     def test_post_when_user_does_not_exist(self) -> None:
@@ -155,7 +155,7 @@ class TestSendEmailVerificationView:
                 kwargs={"email": email},
             ),
         )
-        response = SendEmailVerificationView.as_view()(request, email)
+        response = SendVerificationEmailView.as_view()(request, email)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_post_when_user_has_verified_email(self, user: User) -> None:
@@ -165,7 +165,7 @@ class TestSendEmailVerificationView:
                 kwargs={"email": user.email},
             ),
         )
-        response = SendEmailVerificationView.as_view()(request, user.email)
+        response = SendVerificationEmailView.as_view()(request, user.email)
         assert response.status_code == status.HTTP_409_CONFLICT
 
 
