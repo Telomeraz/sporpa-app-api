@@ -1,11 +1,14 @@
 import pytest
 from faker import Faker
 
+from accounts.api.exceptions import AlreadyVerifiedEmail, InvalidToken, NotVerifiedEmail
 from accounts.api.v1.serializers import (
     AuthTokenSerializer,
     UserCreateSerializer,
+    UserResetPasswordSerializer,
+    UserTokenSerializer,
     UserUpdateSerializer,
-    VerificationTokenSerializer,
+    UserVerificationSerializer,
 )
 from accounts.models import User
 from tests.accounts.factories import UserFactory
@@ -55,7 +58,8 @@ class TestAuthTokenSerializer:
             "password": "testpassword",
         }
         serializer = AuthTokenSerializer(data=data)
-        assert serializer.is_valid() is False
+        with pytest.raises(NotVerifiedEmail):
+            serializer.is_valid()
 
 
 class TestUserCreateSerializer:
@@ -185,17 +189,80 @@ class TestUserUpdateSerializer:
         assert serializer.is_valid() is False
 
 
-class TestVerificationTokenSerializer:
+class TestUserTokenSerializer:
     def test_validate(self, user: User) -> None:
         token = user.make_token()
         data = {
             "token": token,
         }
-        serializer = VerificationTokenSerializer(data=data)
+        serializer = UserTokenSerializer(instance=user, data=data)
         assert serializer.is_valid() is True
         assert serializer.validated_data["token"] == token
 
-    def test_validate_when_no_token(self) -> None:
-        data: dict = {}
-        serializer = VerificationTokenSerializer(data=data)
+    def test_validate_when_token_is_invalid(self, user: User) -> None:
+        token = fake.password(40)
+        data = {
+            "token": token,
+        }
+        serializer = UserTokenSerializer(instance=user, data=data)
+        with pytest.raises(InvalidToken):
+            serializer.is_valid()
+
+
+class TestUserVerificationSerializer:
+    def test_validate(self, unverified_user: User) -> None:
+        serializer = UserVerificationSerializer(instance=unverified_user, data={})
+        assert serializer.is_valid() is True
+
+    def test_validate_when_user_has_already_verified_email(self, user: User) -> None:
+        serializer = UserVerificationSerializer(instance=user, data={})
+        with pytest.raises(AlreadyVerifiedEmail):
+            serializer.is_valid()
+
+    def test_update(self, unverified_user: User) -> None:
+        serializer = UserVerificationSerializer(instance=unverified_user, data={})
+        serializer.is_valid()
+        user = serializer.save()
+        assert user.has_verified_email is True
+
+
+class TestUserResetPasswordSerializer:
+    def test_validate(self, user: User) -> None:
+        password = fake.password()
+        data = {
+            "password": password,
+            "password2": password,
+        }
+        serializer = UserResetPasswordSerializer(instance=user, data=data)
+        assert serializer.is_valid() is True
+
+    def test_validate_when_passwords_do_not_match(self, user: User) -> None:
+        password = fake.password()
+        password2 = fake.password()
+        data = {
+            "password": password,
+            "password2": password2,
+        }
+        serializer = UserResetPasswordSerializer(instance=user, data=data)
         assert serializer.is_valid() is False
+
+    def test_validate_when_user_has_verified_email_is_false(self, unverified_user: User) -> None:
+        password = fake.password()
+        data = {
+            "password": password,
+            "password2": password,
+        }
+        serializer = UserResetPasswordSerializer(instance=unverified_user, data=data)
+        with pytest.raises(NotVerifiedEmail):
+            serializer.is_valid()
+
+    def test_update(self, user: User) -> None:
+        password = fake.password()
+        data = {
+            "password": password,
+            "password2": password,
+        }
+        serializer = UserResetPasswordSerializer(instance=user, data=data)
+        serializer.is_valid()
+        user = serializer.save()
+        assert user.check_password(password) is True

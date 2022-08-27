@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 
-from accounts.api.exceptions import NotVerifiedEmail
+from accounts.api.exceptions import AlreadyVerifiedEmail, InvalidToken, NotVerifiedEmail
 from accounts.models import User
 
 
@@ -134,9 +134,69 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class VerificationTokenSerializer(serializers.Serializer):
+class UserTokenSerializer(serializers.Serializer):
     token = serializers.CharField(
         label=_("Token"),
         write_only=True,
         required=True,
     )
+
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
+        token = attrs["token"]
+        if not self.instance.check_token(token):
+            raise InvalidToken()
+        return super().validate(attrs)
+
+
+class UserVerificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ()
+
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
+        attrs = super().validate(attrs)
+        if self.instance.has_verified_email:
+            raise AlreadyVerifiedEmail()
+        return attrs
+
+    def update(self, instance: User, validated_data: dict) -> User:
+        instance.verify_email()
+        return instance
+
+
+class UserResetPasswordSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(
+        label=_("Password (again)"),
+        style={"input_type": "password"},
+        trim_whitespace=False,
+        write_only=True,
+        required=True,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "password",
+            "password2",
+        )
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
+
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
+        attrs = super().validate(attrs)
+        if attrs["password"] != attrs["password2"]:
+            msg = _("Passwords do not match.")
+            raise serializers.ValidationError(msg, code="invalid")
+
+        if not self.instance.has_verified_email:
+            raise NotVerifiedEmail()
+
+        del attrs["password2"]
+        return attrs
+
+    def update(self, instance: User, validated_data: dict) -> User:
+        password = validated_data["password"]
+        instance.set_password(password)
+        del validated_data["password"]
+        return super().update(instance, validated_data)
