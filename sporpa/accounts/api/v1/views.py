@@ -8,8 +8,10 @@ from django.utils.translation import gettext as _
 from accounts.api.v1.serializers import (
     AuthTokenSerializer,
     UserCreateSerializer,
+    UserResetPasswordSerializer,
+    UserTokenSerializer,
     UserUpdateSerializer,
-    VerificationTokenSerializer,
+    UserVerificationSerializer,
 )
 from accounts.models import User
 
@@ -45,21 +47,14 @@ class SendVerificationEmailView(views.APIView):
 
 class VerifyEmailView(views.APIView):
     permission_classes = ()
-    serializer_class = VerificationTokenSerializer
 
     def post(self, request: Request, email: str) -> Response:
         user: User = generics.get_object_or_404(User, email=email)
-        serializer = self.serializer_class(data=request.query_params)
+        UserTokenSerializer(instance=user, data=request.query_params).is_valid(raise_exception=True)
+
+        serializer = UserVerificationSerializer(instance=user, data={})
         serializer.is_valid(raise_exception=True)
-
-        if user.has_verified_email:
-            return Response({"detail": _("User has already verified email.")}, status=status.HTTP_409_CONFLICT)
-
-        token = serializer.validated_data["token"]
-        if not user.check_token(token):
-            return Response({"detail": _("Token is invalid or expired.")}, status=status.HTTP_400_BAD_REQUEST)
-
-        user.verify_email()
+        serializer.save()
         return Response({"detail": _("Email verified.")})
 
 
@@ -70,3 +65,17 @@ class SendPasswordResetEmailView(views.APIView):
         user: User = generics.get_object_or_404(User, email=email)
         user.send_password_reset_email(build_absolute_uri=request.build_absolute_uri)
         return Response({"detail": _("Password reset email sent.")})
+
+
+class ResetPasswordView(views.APIView):
+    permission_classes = ()
+    serializer_class = UserResetPasswordSerializer
+
+    def post(self, request: Request, email: str) -> Response:
+        user: User = generics.get_object_or_404(User, email=email)
+        UserTokenSerializer(instance=user, data=request.query_params).is_valid(raise_exception=True)
+
+        serializer = self.serializer_class(instance=user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": _("Password reset.")})

@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     AuthTokenView,
     RegisterView,
+    ResetPasswordView,
     SendPasswordResetEmailView,
     SendVerificationEmailView,
     UpdateUserView,
@@ -40,5 +41,10 @@ urlpatterns = [
         "user/send-password-reset-email/<str:email>/",
         SendPasswordResetEmailView.as_view(),
         name="send-password-reset-email",
+    ),
+    path(
+        "user/reset-password/<str:email>/",
+        ResetPasswordView.as_view(),
+        name="reset-password",
     ),
 ]
