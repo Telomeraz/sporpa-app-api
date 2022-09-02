@@ -14,19 +14,25 @@ class TrackingManagerMixin(models.Manager):
         queryset = super().get_queryset()
         if self.all_objects:
             return queryset
-        return queryset.filter(deleted_at__isnull=True)
+        return queryset.filter(is_active=True)
 
 
 class TrackingMixin(models.Model):
+    is_active = models.BooleanField(
+        _("active"),
+        default=True,
+        help_text=_(
+            "Designates whether this record should be treated as active. " "Unselect this instead of deleting records."
+        ),
+    )
     created_at = models.DateTimeField(
         _("created at"),
         auto_now_add=True,
     )
     deleted_at = models.DateTimeField(
         _("deleted at"),
-        default=None,
         help_text=_(
-            "Designates whether this user should be treated as active. Enter a datetime instead of deleting user.",
+            "Enter a datetime instead when you delete the record.",
         ),
         null=True,
         blank=True,
