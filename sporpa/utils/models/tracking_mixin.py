@@ -22,7 +22,7 @@ class TrackingMixin(models.Model):
         _("active"),
         default=True,
         help_text=_(
-            "Designates whether this record should be treated as active. " "Unselect this instead of deleting records."
+            "Designates whether this record should be treated as active. Unselect this instead of deleting records.",
         ),
     )
     created_at = models.DateTimeField(

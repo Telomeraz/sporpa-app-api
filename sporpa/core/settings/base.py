@@ -17,6 +17,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "dj_rest_auth",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "dj_rest_auth.registration",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "drf_spectacular",
     "accounts",
     "utils",
@@ -56,9 +63,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
 
 # Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -77,7 +88,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
 
@@ -89,7 +99,6 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "/static/"
 
@@ -97,7 +106,8 @@ MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 
-# DRF Settings
+
+# djangorestframework
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -110,7 +120,7 @@ REST_FRAMEWORK = {
 }
 
 
-# DRF Spectacular
+# drf-spectacular
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Sporpa API",
@@ -118,3 +128,26 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+
+# django-allauth
+
+SITE_ID = 1
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_USERNAME_REQUIRED = False
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+ACCOUNT_MANDATORY = True
+
+ACCOUNT_EMAIL_VERIFICATION = True
+
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "https://www.google.com"
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+
+SOCIALACCOUNT_EMAIL_VERIFICATION = True

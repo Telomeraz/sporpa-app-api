@@ -9,7 +9,6 @@ DEBUG = True
 INSTALLED_APPS += ("django_extensions",)
 
 # Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     "default": {
@@ -23,6 +22,19 @@ DATABASES = {
 }
 
 
-# Email Settings
+# Email
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# django-allauth
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": "123",
+            "secret": "456",
+            "key": "",
+        },
+    },
+}

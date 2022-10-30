@@ -35,6 +35,6 @@ class TestTrackingManagerMixin:
         assert TrackingMixinTestModel.all_objects.count() == 1
 
     def test_get_queryset_when_passive_record(self, TrackingMixinTestModel: Type[TrackingMixin]) -> None:
-        TrackingMixinTestModel.objects.create(deleted_at=timezone.now())
+        TrackingMixinTestModel.objects.create(is_active=False, deleted_at=timezone.now())
         assert TrackingMixinTestModel.objects.count() == 0
         assert TrackingMixinTestModel.all_objects.count() == 1

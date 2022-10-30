@@ -22,13 +22,16 @@ def user() -> User:
 @pytest.fixture
 def passive_user() -> User:
     return UserFactory(
+        is_active=False,
         deleted_at=timezone.now(),
     )
 
 
 @pytest.fixture
 def unverified_user() -> User:
-    return UserFactory(has_verified_email=False)
+    return UserFactory(
+        email_address1__verified=False,
+    )
 
 
 @pytest.fixture
