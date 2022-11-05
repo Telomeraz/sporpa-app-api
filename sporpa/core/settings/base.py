@@ -1,14 +1,32 @@
 from pathlib import Path
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS: list = []
 
+SECRET_KEY = config("SECRET_KEY")
+
+
+# Database
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT"),
+    }
+}
+
 
 # Application definition
 
-INSTALLED_APPS = [
+INSTALLED_APPS: list = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -146,8 +164,15 @@ ACCOUNT_MANDATORY = True
 
 ACCOUNT_EMAIL_VERIFICATION = True
 
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "https://www.google.com"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "https://127.0.0.1:8000"  # dummy for now
 
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
-SOCIALACCOUNT_EMAIL_VERIFICATION = True
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": config("GOOGLE_CLIENT_ID"),
+            "secret": config("GOOGLE_SECRET"),
+        },
+    },
+}

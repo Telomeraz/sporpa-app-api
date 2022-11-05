@@ -1,10 +1,11 @@
 from allauth.account.views import confirm_email, email_verification_sent
+from allauth.socialaccount.views import connections, login_cancelled, login_error, signup
 from dj_rest_auth.registration.views import RegisterView, ResendEmailVerificationView
 from dj_rest_auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetConfirmView, PasswordResetView
 
 from django.urls import path
 
-from .views import UserUpdateView
+from .views import GoogleLoginView, UserUpdateView
 
 urlpatterns = [
     path(
@@ -56,5 +57,30 @@ urlpatterns = [
         "user/update/",
         UserUpdateView.as_view(),
         name="user_update",
+    ),
+    path(
+        "login/google/",
+        GoogleLoginView.as_view(),
+        name="google_login",
+    ),
+    path(
+        "login/cancelled/",
+        login_cancelled,
+        name="socialaccount_login_cancelled",
+    ),
+    path(
+        "login/error/",
+        login_error,
+        name="socialaccount_login_error",
+    ),
+    path(
+        "signup/",
+        signup,
+        name="socialaccount_signup",
+    ),
+    path(
+        "connections/",
+        connections,
+        name="socialaccount_connections",
     ),
 ]
