@@ -26,7 +26,7 @@ DATABASES = {
 
 # Application definition
 
-INSTALLED_APPS: list = [
+INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,6 +44,8 @@ INSTALLED_APPS: list = [
     "allauth.socialaccount.providers.google",
     "drf_spectacular",
     "accounts",
+    "events",
+    "participants",
     "utils",
 ]
 
