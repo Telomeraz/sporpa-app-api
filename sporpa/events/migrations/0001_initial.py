@@ -2,59 +2,96 @@
 
 import django.contrib.postgres.fields.ranges
 import django.core.validators
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Activity',
+            name="Activity",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True, help_text='Designates whether this record should be treated as active. Unselect this instead of deleting records.', verbose_name='active')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='created at')),
-                ('deleted_at', models.DateTimeField(blank=True, help_text='Enter a datetime instead when you delete the record.', null=True, verbose_name='deleted at')),
-                ('player_limit', models.PositiveSmallIntegerField(default=2, validators=[django.core.validators.MinValueValidator(2), django.core.validators.MaxValueValidator(30)], verbose_name='maximum number of players')),
-                ('name', models.CharField(max_length=150, verbose_name='name')),
-                ('about', models.TextField(blank=True, max_length=600, verbose_name='about')),
-                ('available_between_at', django.contrib.postgres.fields.ranges.DateTimeRangeField(verbose_name='available between at')),
-                ('status', models.PositiveSmallIntegerField(choices=[(1, 'Open'), (2, 'Played'), (3, 'Cancelled')], default=1, verbose_name='status')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Designates whether this record should be treated as active. Unselect this instead of deleting records.",
+                        verbose_name="active",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="created at")),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="Enter a datetime instead when you delete the record.",
+                        null=True,
+                        verbose_name="deleted at",
+                    ),
+                ),
+                (
+                    "player_limit",
+                    models.PositiveSmallIntegerField(
+                        default=2,
+                        validators=[
+                            django.core.validators.MinValueValidator(2),
+                            django.core.validators.MaxValueValidator(30),
+                        ],
+                        verbose_name="maximum number of players",
+                    ),
+                ),
+                ("name", models.CharField(max_length=150, verbose_name="name")),
+                ("about", models.TextField(blank=True, max_length=600, verbose_name="about")),
+                (
+                    "available_between_at",
+                    django.contrib.postgres.fields.ranges.DateTimeRangeField(verbose_name="available between at"),
+                ),
+                (
+                    "status",
+                    models.PositiveSmallIntegerField(
+                        choices=[(1, "Open"), (2, "Played"), (3, "Cancelled")], default=1, verbose_name="status"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'activity',
-                'verbose_name_plural': 'activities',
-                'db_table': 'activity',
+                "verbose_name": "activity",
+                "verbose_name_plural": "activities",
+                "db_table": "activity",
             },
         ),
         migrations.CreateModel(
-            name='ActivityLevel',
+            name="ActivityLevel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
             ],
             options={
-                'verbose_name': 'activity level',
-                'verbose_name_plural': 'activity levels',
-                'db_table': 'activity_level',
+                "verbose_name": "activity level",
+                "verbose_name_plural": "activity levels",
+                "db_table": "activity_level",
             },
         ),
         migrations.CreateModel(
-            name='ActivityPlayer',
+            name="ActivityPlayer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_organizer', models.BooleanField(default=False)),
-                ('activity', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='events.activity', verbose_name='activity')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("is_organizer", models.BooleanField(default=False)),
+                (
+                    "activity",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="events.activity", verbose_name="activity"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'activity player',
-                'verbose_name_plural': 'activity players',
-                'db_table': 'activity_player',
+                "verbose_name": "activity player",
+                "verbose_name_plural": "activity players",
+                "db_table": "activity_player",
             },
         ),
     ]
