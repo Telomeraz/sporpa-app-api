@@ -25,4 +25,4 @@ django_settings_module = "sporpa"
 [tool.pytest.ini_options]
 pythonpath = "sporpa"
 DJANGO_SETTINGS_MODULE = "core.settings.test"
-addopts = "--nomigrations --cov=. --cov-report=html"
+addopts = "--cov=. --cov-report=html"
