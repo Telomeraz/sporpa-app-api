@@ -1,7 +1,6 @@
 import pytest
 from allauth.account.models import EmailAddress
 from faker import Faker
-from rest_framework.test import APIRequestFactory
 
 from django.core import mail
 from django.utils.translation import gettext_lazy as _
@@ -11,7 +10,6 @@ from tests.accounts.factories import UserFactory
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
-request_factory = APIRequestFactory()
 
 
 class TestUserManager:
