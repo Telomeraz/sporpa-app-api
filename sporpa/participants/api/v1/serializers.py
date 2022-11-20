@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from participants.models import Sport
+from participants.models import Sport, SportLevel
 
 
 class SportSerializer(serializers.ModelSerializer):
@@ -9,6 +9,18 @@ class SportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sport
+        fields = (
+            "value",
+            "display",
+        )
+
+
+class SportLevelSerializer(serializers.ModelSerializer):
+    value = serializers.ChoiceField(source="level", choices=SportLevel.Level)
+    display = serializers.CharField(source="get_level_display")
+
+    class Meta:
+        model = SportLevel
         fields = (
             "value",
             "display",
