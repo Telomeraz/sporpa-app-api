@@ -1,6 +1,15 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import User
+
+
+class PlayerSportManager(models.Manager):
+    def filter_user(self, user: User | int) -> models.QuerySet:
+        if isinstance(user, User):
+            return self.filter(player_id=user.id)
+        return self.filter(player_id=user)
+
 
 class PlayerSport(models.Model):
     player = models.ForeignKey(
@@ -22,6 +31,8 @@ class PlayerSport(models.Model):
         related_name="player_sports",
     )
 
+    objects = PlayerSportManager()
+
     class Meta:
         db_table = "player_sport"
         verbose_name = _("player sport")
@@ -32,6 +43,7 @@ class PlayerSport(models.Model):
                 name="player_sport_unique",
             ),
         )
+        ordering = ("-level", "sport")
 
     def __str__(self) -> str:
-        return f"{self.player.user} - {self.sport} - {self.level}"
+        return f"{self.player} - {self.sport} - {self.level}"
