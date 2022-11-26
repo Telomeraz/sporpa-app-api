@@ -7,7 +7,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
 
-from accounts.api.v1.views import UserUpdateView
+from accounts.api.v1.views import UserDetailView, UserUpdateView
 from accounts.models import User
 
 fake = Faker()
@@ -50,4 +50,15 @@ class TestUserUpdateView:
             )
         force_authenticate(request, user=user)
         response = UserUpdateView.as_view()(request)
+        assert response.status_code == status.HTTP_200_OK
+
+
+class TestUserDetailView:
+    def test_get(self, user: User, user2: User) -> None:
+        request = request_factory.get(
+            reverse("user_detail", kwargs={"pk": user2.pk}),
+        )
+        force_authenticate(request, user=user)
+        response = UserDetailView.as_view()(request, pk=user2.pk)
+
         assert response.status_code == status.HTTP_200_OK
