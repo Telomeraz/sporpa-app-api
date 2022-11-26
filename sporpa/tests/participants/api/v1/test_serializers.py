@@ -7,7 +7,7 @@ pytestmark = pytest.mark.django_db
 
 
 class TestSportSerializer:
-    def test_update(self) -> None:
+    def test_data(self) -> None:
         sport = Sport.objects.first()
         assert sport is not None
         data = {
@@ -21,7 +21,7 @@ class TestSportSerializer:
 
 
 class TestSportLevelSerializer:
-    def test_update(self) -> None:
+    def test_data(self) -> None:
         sport_level = SportLevel.objects.first()
         assert sport_level is not None
         data = {

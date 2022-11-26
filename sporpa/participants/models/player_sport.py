@@ -7,8 +7,8 @@ from accounts.models import User
 class PlayerSportManager(models.Manager):
     def filter_user(self, user: User | int) -> models.QuerySet:
         if isinstance(user, User):
-            return self.filter(player_id=user.id)
-        return self.filter(player_id=user)
+            return self.filter(player__pk=user.pk)
+        return self.filter(player__pk=user)
 
 
 class PlayerSport(models.Model):

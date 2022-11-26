@@ -20,6 +20,11 @@ def user() -> User:
 
 
 @pytest.fixture
+def user2() -> User:
+    return UserFactory()
+
+
+@pytest.fixture
 def passive_user() -> User:
     return UserFactory(
         is_active=False,
