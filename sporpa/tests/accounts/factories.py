@@ -23,10 +23,14 @@ class UserFactory(factory.django.DjangoModelFactory):
     gender = factory.fuzzy.FuzzyChoice(User.Gender.choices, getter=lambda c: c[0])
     about = factory.Faker("text", max_nb_chars=User.about.field.max_length)
     email_address1 = factory.RelatedFactory(
-        EmailAddressFactory,
+        "tests.accounts.factories.EmailAddressFactory",
         factory_related_name="user",
         primary=True,
         email=factory.SelfAttribute("..email"),
+    )
+    player = factory.RelatedFactory(
+        "tests.participants.factories.PlayerFactory",
+        factory_related_name="user",
     )
 
     class Meta:
