@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from participants.models import Sport, SportLevel
+from participants.models import Player, PlayerSport, Sport, SportLevel
 
 
 class SportSerializer(serializers.ModelSerializer):
@@ -25,3 +25,23 @@ class SportLevelSerializer(serializers.ModelSerializer):
             "value",
             "display",
         )
+
+
+class PlayerSportSerializer(serializers.ModelSerializer):
+    sport = SportSerializer(read_only=True)
+    level = SportLevelSerializer()
+
+    class Meta:
+        model = PlayerSport
+        fields = (
+            "sport",
+            "level",
+        )
+
+
+class PlayerSerializer(serializers.ModelSerializer):
+    sports = PlayerSportSerializer(many=True)
+
+    class Meta:
+        model = Player
+        fields = ("sports",)

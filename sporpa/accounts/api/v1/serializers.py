@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
 from accounts.models import User
+from participants.api.v1.serializers import PlayerSerializer
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -13,4 +16,5 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             "birthdate",
             "gender",
             "about",
+            "player",
         )
