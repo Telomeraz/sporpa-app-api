@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
+from django.utils.dateparse import parse_date
 
 from accounts.api.v1.views import UserDetailView, UserUpdateView
 from accounts.models import User
@@ -35,7 +36,17 @@ class TestUserUpdateView:
             )
         force_authenticate(request, user=user)
         response = UserUpdateView.as_view()(request)
+
         assert response.status_code == status.HTTP_200_OK
+        assert response.data["first_name"] == user.first_name
+        assert response.data["last_name"] == user.last_name
+        assert response.data["avatar"] == request.build_absolute_uri(user.avatar.url)
+        assert parse_date(response.data["birthdate"]) == user.birthdate
+        assert response.data["gender"] == user.gender
+        assert response.data["about"] == user.about
+        for data, player_sport in zip(response.data["player"]["sports"], user.player.sports.all()):
+            assert data["sport"]["value"] == player_sport.sport.name
+            assert data["level"]["value"] == player_sport.level.level
 
     def test_patch(self, user: User, image_file: tempfile._TemporaryFileWrapper) -> None:
         with open(image_file.name, "rb") as image_data:
@@ -50,7 +61,17 @@ class TestUserUpdateView:
             )
         force_authenticate(request, user=user)
         response = UserUpdateView.as_view()(request)
+
         assert response.status_code == status.HTTP_200_OK
+        assert response.data["first_name"] == user.first_name
+        assert response.data["last_name"] == user.last_name
+        assert response.data["avatar"] == request.build_absolute_uri(user.avatar.url)
+        assert parse_date(response.data["birthdate"]) == user.birthdate
+        assert response.data["gender"] == user.gender
+        assert response.data["about"] == user.about
+        for data, player_sport in zip(response.data["player"]["sports"], user.player.sports.all()):
+            assert data["sport"]["value"] == player_sport.sport.name
+            assert data["level"]["value"] == player_sport.level.level
 
 
 class TestUserDetailView:
@@ -62,3 +83,12 @@ class TestUserDetailView:
         response = UserDetailView.as_view()(request, pk=user2.pk)
 
         assert response.status_code == status.HTTP_200_OK
+        assert response.data["first_name"] == user2.first_name
+        assert response.data["last_name"] == user2.last_name
+        assert response.data["avatar"] == request.build_absolute_uri(user2.avatar.url)
+        assert parse_date(response.data["birthdate"]) == user2.birthdate
+        assert response.data["gender"] == user2.gender
+        assert response.data["about"] == user2.about
+        for data, player_sport in zip(response.data["player"]["sports"], user2.player.sports.all()):
+            assert data["sport"]["value"] == player_sport.sport.name
+            assert data["level"]["value"] == player_sport.level.level
