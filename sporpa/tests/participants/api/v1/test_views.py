@@ -5,7 +5,6 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.urls import reverse
 
 from accounts.models import User
-from participants.api.v1.serializers import SportLevelSerializer, SportSerializer
 from participants.api.v1.views import SportLevelListView, SportListView
 from participants.models import Sport, SportLevel
 
@@ -21,12 +20,11 @@ class TestSportListView:
         force_authenticate(request, user=user)
         response = SportListView.as_view()(request)
 
-        sports = Sport.objects.all()
-        serializer = SportSerializer(sports, many=True)
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data["results"]
-        assert response.data["results"] == serializer.data
+        for data, sport in zip(response.data["results"], Sport.objects.all()):
+            assert data["value"] == sport.pk
+            assert data["display"] == sport.get_name_display()
 
 
 class TestSportLevelListView:
@@ -37,9 +35,8 @@ class TestSportLevelListView:
         force_authenticate(request, user=user)
         response = SportLevelListView.as_view()(request)
 
-        sport_levels = SportLevel.objects.all()
-        serializer = SportLevelSerializer(sport_levels, many=True)
-
         assert response.status_code == status.HTTP_200_OK
         assert response.data["results"]
-        assert response.data["results"] == serializer.data
+        for data, sport_level in zip(response.data["results"], SportLevel.objects.all()):
+            assert data["value"] == sport_level.pk
+            assert data["display"] == sport_level.get_level_display()
