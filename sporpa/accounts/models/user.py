@@ -62,9 +62,9 @@ def user_directory_path(instance: "User", filename: str) -> str:
 
 class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     class Gender(models.IntegerChoices):
-        UNSPECIFIED = 0, _("Unspecified")
-        MALE = 1, _("Male")
-        FEMALE = 2, _("Female")
+        UNSPECIFIED = 1, _("Unspecified")
+        MALE = 2, _("Male")
+        FEMALE = 3, _("Female")
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
