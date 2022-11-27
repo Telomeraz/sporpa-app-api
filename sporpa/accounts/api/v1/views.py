@@ -19,4 +19,6 @@ class UserUpdateView(generics.UpdateAPIView):
 
 class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.select_related("player").prefetch_related(
+        "player__sports",
+    )

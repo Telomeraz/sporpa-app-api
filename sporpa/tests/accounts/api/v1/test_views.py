@@ -45,8 +45,8 @@ class TestUserUpdateView:
         assert response.data["gender"] == user.gender
         assert response.data["about"] == user.about
         for data, player_sport in zip(response.data["player"]["sports"], user.player.sports.all()):
-            assert data["sport"]["value"] == player_sport.sport.name
-            assert data["level"]["value"] == player_sport.level.level
+            assert data["sport"] == player_sport.sport_id
+            assert data["level"] == player_sport.level_id
 
     def test_patch(self, user: User, image_file: tempfile._TemporaryFileWrapper) -> None:
         with open(image_file.name, "rb") as image_data:
@@ -70,8 +70,8 @@ class TestUserUpdateView:
         assert response.data["gender"] == user.gender
         assert response.data["about"] == user.about
         for data, player_sport in zip(response.data["player"]["sports"], user.player.sports.all()):
-            assert data["sport"]["value"] == player_sport.sport.name
-            assert data["level"]["value"] == player_sport.level.level
+            assert data["sport"] == player_sport.sport_id
+            assert data["level"] == player_sport.level_id
 
 
 class TestUserDetailView:
@@ -90,5 +90,5 @@ class TestUserDetailView:
         assert response.data["gender"] == user2.gender
         assert response.data["about"] == user2.about
         for data, player_sport in zip(response.data["player"]["sports"], user2.player.sports.all()):
-            assert data["sport"]["value"] == player_sport.sport.name
-            assert data["level"]["value"] == player_sport.level.level
+            assert data["sport"] == player_sport.sport_id
+            assert data["level"] == player_sport.level_id

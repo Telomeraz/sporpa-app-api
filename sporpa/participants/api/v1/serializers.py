@@ -28,9 +28,6 @@ class SportLevelSerializer(serializers.ModelSerializer):
 
 
 class PlayerSportSerializer(serializers.ModelSerializer):
-    sport = SportSerializer(read_only=True)
-    level = SportLevelSerializer()
-
     class Meta:
         model = PlayerSport
         fields = (

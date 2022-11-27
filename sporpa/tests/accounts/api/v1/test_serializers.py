@@ -45,5 +45,5 @@ class TestUserSerializer:
         assert serializer.data["gender"] == user.gender
         assert serializer.data["about"] == user.about
         for data, player_sport in zip(serializer.data["player"]["sports"], user.player.sports.all()):
-            assert data["sport"]["value"] == player_sport.sport.name
-            assert data["level"]["value"] == player_sport.level.level
+            assert data["sport"] == player_sport.sport_id
+            assert data["level"] == player_sport.level_id

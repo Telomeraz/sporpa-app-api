@@ -45,14 +45,8 @@ class TestPlayerSportSerializer:
         player_sport = user.player.sports.first()
         assert player_sport is not None
         data = {
-            "sport": {
-                "value": player_sport.sport.name,
-                "display": player_sport.sport.get_name_display(),
-            },
-            "level": {
-                "value": player_sport.level.level,
-                "display": player_sport.level.get_level_display(),
-            },
+            "sport": player_sport.sport_id,
+            "level": player_sport.level_id,
         }
 
         serializer = PlayerSportSerializer(player_sport)
@@ -65,5 +59,5 @@ class TestPlayerSerializer:
         serializer = PlayerSerializer(user.player)
 
         for data, player_sport in zip(serializer.data["sports"], user.player.sports.all()):
-            assert data["sport"]["value"] == player_sport.sport.name
-            assert data["level"]["value"] == player_sport.level.level
+            assert data["sport"] == player_sport.sport_id
+            assert data["level"] == player_sport.level_id
