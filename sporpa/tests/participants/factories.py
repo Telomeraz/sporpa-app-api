@@ -21,6 +21,7 @@ class PlayerFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Player
+        django_get_or_create = ("user",)
 
 
 class PlayerSportFactory(factory.django.DjangoModelFactory):

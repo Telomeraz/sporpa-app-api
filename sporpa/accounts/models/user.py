@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Iterable
 
 from rest_framework.authtoken.models import Token
 
@@ -123,6 +123,22 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     def clean(self) -> None:
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
+
+    def save(
+        self,
+        force_insert: bool = False,
+        force_update: bool = False,
+        using: str | None = None,
+        update_fields: Iterable[str] | None = None,
+    ) -> None:
+        from participants.models import Player
+
+        created = self.pk is None
+        super().save(force_insert, force_update, using, update_fields)
+        if created:
+            Player.objects.create(
+                user=self,
+            )
 
     @property
     def full_name(self) -> str:
