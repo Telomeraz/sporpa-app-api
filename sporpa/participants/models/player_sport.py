@@ -1,14 +1,14 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from accounts.models import User
+from participants import models as participant_models
 
 
 class PlayerSportManager(models.Manager):
-    def filter_user(self, user: User | int) -> models.QuerySet:
-        if isinstance(user, User):
-            return self.filter(player__pk=user.pk)
-        return self.filter(player__pk=user)
+    def filter_player(self, player: participant_models.Player | int) -> models.QuerySet:
+        if isinstance(player, participant_models.Player):
+            return self.filter(player__pk=player.pk)
+        return self.filter(player__pk=player)
 
 
 class PlayerSport(models.Model):
