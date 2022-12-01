@@ -1,17 +1,80 @@
+import random
+
 import pytest
 
-from participants.models import Sport, SportLevel
+from django.db import IntegrityError
+
+from accounts.models import User
+from participants.models import PlayerSport, Sport, SportLevel
 
 pytestmark = pytest.mark.django_db
 
 
 class TestSport:
-    def test__str__(self) -> None:
-        sport = Sport.objects.get(name=Sport.Name.FOOTBALL.value)
-        assert str(sport) == Sport.Name.FOOTBALL.label
+    def test_str(self) -> None:
+        sport = random.choice(Sport.objects.all())
+        assert str(sport) == sport.get_name_display()
 
 
 class TestSportLevel:
-    def test__str__(self) -> None:
-        sport_level = SportLevel.objects.get(level=SportLevel.Level.BEGINNER.value)
-        assert str(sport_level) == SportLevel.Level.BEGINNER.label
+    def test_str(self) -> None:
+        sport_level = random.choice(SportLevel.objects.all())
+        assert str(sport_level) == sport_level.get_level_display()
+
+
+class TestPlayerSportManager:
+    def test_filter_player(self, user: User) -> None:
+        player_sports = PlayerSport.objects.filter_player(user.player)
+        assert player_sports.count() == PlayerSport.objects.filter(player=user.player).count()
+        for player_sport in player_sports:
+            assert player_sport.player == user.player
+
+    def test_filter_player_when_send_int_as_parameter(self, user: User) -> None:
+        player_sports = PlayerSport.objects.filter_player(user.player.pk)
+        assert player_sports.count() == PlayerSport.objects.filter(player=user.player).count()
+        for player_sport in player_sports:
+            assert player_sport.player == user.player
+
+    def test_filter_player_when_user_does_not_have_sport(self, user_without_sport: User) -> None:
+        player_sports = PlayerSport.objects.filter_player(user_without_sport.player)
+        assert player_sports.count() == PlayerSport.objects.filter(player=user_without_sport.player).count()
+
+
+class TestPlayerSport:
+    def test_str(self, user_without_sport: User) -> None:
+        sport = random.choice(Sport.objects.all())
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "player": user_without_sport.player,
+            "sport": sport,
+            "level": sport_level,
+        }
+        player_sport = user_without_sport.player.add_sport(data)
+        assert str(player_sport) == f"{player_sport.player} - {player_sport.sport} - {player_sport.level}"
+
+
+class TestPlayer:
+    def test_add_sport(self, user_without_sport: User) -> None:
+        sport = random.choice(Sport.objects.all())
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "player": user_without_sport.player,
+            "sport": sport,
+            "level": sport_level,
+        }
+
+        player_sport = user_without_sport.player.add_sport(data)
+
+        assert user_without_sport.player.sports.filter(pk=player_sport.pk).exists()
+
+    def test_add_sport_when_has_same_sport(self, user: User) -> None:
+        sport = user.player.sports.first().sport
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "player": user.player,
+            "sport": sport,
+            "level": sport_level,
+        }
+
+        with pytest.raises(IntegrityError):
+            user.player.add_sport(data)

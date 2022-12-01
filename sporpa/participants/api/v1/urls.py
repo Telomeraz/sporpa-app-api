@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import SportLevelListView, SportListView
+from .views import PlayerSportCreateView, SportLevelListView, SportListView
 
 urlpatterns = [
     path(
@@ -12,5 +12,10 @@ urlpatterns = [
         "sport-level-list/",
         SportLevelListView.as_view(),
         name="sport_level_list",
+    ),
+    path(
+        "player-sport/create/",
+        PlayerSportCreateView.as_view(),
+        name="player_sport_create",
     ),
 ]

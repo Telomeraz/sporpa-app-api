@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import serializers
 
 from participants.models import Player, PlayerSport, Sport, SportLevel
@@ -31,9 +33,20 @@ class PlayerSportSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerSport
         fields = (
+            "player",
             "sport",
             "level",
         )
+        extra_kwargs = {"write_only": {"player": True}}
+        validators = (
+            serializers.UniqueTogetherValidator(
+                queryset=PlayerSport.objects.all(),
+                fields=("player", "sport"),
+            ),
+        )
+
+    def create(self, validated_data: dict[str, Any]) -> PlayerSport:
+        return validated_data["player"].add_sport(validated_data)
 
 
 class PlayerSerializer(serializers.ModelSerializer):

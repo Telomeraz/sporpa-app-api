@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from accounts.models import User
@@ -45,6 +47,7 @@ class TestPlayerSportSerializer:
         player_sport = user.player.sports.first()
         assert player_sport is not None
         data = {
+            "player": user.player.pk,
             "sport": player_sport.sport_id,
             "level": player_sport.level_id,
         }
@@ -52,6 +55,36 @@ class TestPlayerSportSerializer:
         serializer = PlayerSportSerializer(player_sport)
 
         assert serializer.data == data
+
+    def test_create(self, user_without_sport: User) -> None:
+        sport = random.choice(Sport.objects.all())
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "player": user_without_sport.player.pk,
+            "sport": sport.pk,
+            "level": sport_level.pk,
+        }
+
+        serializer = PlayerSportSerializer(data=data)
+        assert serializer.is_valid()
+
+        player_sport = serializer.save()
+
+        assert player_sport.sport == sport
+        assert player_sport.level == sport_level
+
+    def test_create_when_has_same_sport(self, user: User) -> None:
+        sport = user.player.sports.first().sport
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "player": user.player.pk,
+            "sport": sport.pk,
+            "level": sport_level.pk,
+        }
+
+        serializer = PlayerSportSerializer(data=data)
+
+        assert serializer.is_valid() is False
 
 
 class TestPlayerSerializer:

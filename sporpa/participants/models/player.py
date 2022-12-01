@@ -1,6 +1,10 @@
+from typing import Any
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from participants import models as participant_models
 
 
 class Player(models.Model):
@@ -20,3 +24,6 @@ class Player(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user}"
+
+    def add_sport(self, data: dict[str, Any]) -> "participant_models.PlayerSport":
+        return participant_models.PlayerSport.objects.create(**data)

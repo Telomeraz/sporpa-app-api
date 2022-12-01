@@ -25,6 +25,11 @@ def user2() -> User:
 
 
 @pytest.fixture
+def user_without_sport() -> User:
+    return UserFactory(player=None)
+
+
+@pytest.fixture
 def passive_user() -> User:
     return UserFactory(
         is_active=False,
