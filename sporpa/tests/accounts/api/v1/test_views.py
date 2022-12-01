@@ -33,6 +33,7 @@ class TestUserUpdateView:
             request = request_factory.put(
                 reverse("user_update"),
                 data=data,
+                format="multipart",
             )
         force_authenticate(request, user=user)
         response = UserUpdateView.as_view()(request)
@@ -58,6 +59,7 @@ class TestUserUpdateView:
             request = request_factory.patch(
                 reverse("user_update"),
                 data=data,
+                format="multipart",
             )
         force_authenticate(request, user=user)
         response = UserUpdateView.as_view()(request)

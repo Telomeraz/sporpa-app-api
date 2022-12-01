@@ -24,7 +24,8 @@ class TestUserSerializer:
             "about": user_factory.about,
         }
         serializer = UserSerializer(instance=user, data=data)
-        serializer.is_valid()
+        assert serializer.is_valid()
+
         updated_user = serializer.save()
 
         assert updated_user.email == user.email
