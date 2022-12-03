@@ -1,21 +1,22 @@
 from django.urls import path
 
-from .views import PlayerSportCreateView, SportLevelListView, SportListView
+from .views import PlayerSportView, SportLevelView, SportView
 
+app_name = "participants"
 urlpatterns = [
     path(
-        "sport-list/",
-        SportListView.as_view(),
-        name="sport_list",
+        "sports/",
+        SportView.as_view(),
+        name="sports",
     ),
     path(
-        "sport-level-list/",
-        SportLevelListView.as_view(),
-        name="sport_level_list",
+        "sport-levels/",
+        SportLevelView.as_view(),
+        name="sport_levels",
     ),
     path(
-        "player-sport/create/",
-        PlayerSportCreateView.as_view(),
-        name="player_sport_create",
+        "player-sports/",
+        PlayerSportView.as_view(),
+        name="player_sports",
     ),
 ]

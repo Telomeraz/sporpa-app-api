@@ -7,17 +7,17 @@ from participants.models import Sport, SportLevel
 from .serializers import PlayerSportSerializer, SportLevelSerializer, SportSerializer
 
 
-class SportListView(generics.ListAPIView):
+class SportView(generics.ListAPIView):
     serializer_class = SportSerializer
     queryset = Sport.objects.all()
 
 
-class SportLevelListView(generics.ListAPIView):
+class SportLevelView(generics.ListAPIView):
     serializer_class = SportLevelSerializer
     queryset = SportLevel.objects.all()
 
 
-class PlayerSportCreateView(generics.CreateAPIView):
+class PlayerSportView(generics.CreateAPIView):
     serializer_class = PlayerSportSerializer
 
     def create(self, request: request.Request, *args: tuple, **kwargs: dict[str, Any]) -> response.Response:
