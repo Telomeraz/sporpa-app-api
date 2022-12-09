@@ -6,6 +6,7 @@ from accounts.models import User
 from participants.api.v1.serializers import (
     PlayerSerializer,
     PlayerSportSerializer,
+    PlayerSportUpdateLevelSerializer,
     SportLevelSerializer,
     SportSerializer,
 )
@@ -85,6 +86,25 @@ class TestPlayerSportSerializer:
         serializer = PlayerSportSerializer(data=data)
 
         assert serializer.is_valid() is False
+
+
+class TestPlayerSportUpdateLevelSerializer:
+    def test_update(self, user: User) -> None:
+        player_sport = user.player.sports.first()
+        sport = player_sport.sport
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "player": user.player.pk,
+            "level": sport_level.pk,
+        }
+
+        serializer = PlayerSportUpdateLevelSerializer(instance=player_sport, data=data)
+        assert serializer.is_valid()
+
+        player_sport = serializer.save()
+
+        assert player_sport.sport == sport
+        assert player_sport.level == sport_level
 
 
 class TestPlayerSerializer:

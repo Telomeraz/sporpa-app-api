@@ -35,7 +35,7 @@ class TestPlayerSportManager:
         for player_sport in player_sports:
             assert player_sport.player == user.player
 
-    def test_filter_player_when_user_does_not_have_sport(self, user_without_sport: User) -> None:
+    def test_filter_player_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
         player_sports = PlayerSport.objects.filter_player(user_without_sport.player)
         assert player_sports.count() == PlayerSport.objects.filter(player=user_without_sport.player).count()
 
@@ -49,12 +49,19 @@ class TestPlayerSport:
             "sport": sport,
             "level": sport_level,
         }
-        player_sport = user_without_sport.player.add_sport(data)
+        player_sport = user_without_sport.player.create_sport(data)
         assert str(player_sport) == f"{player_sport.player} - {player_sport.sport} - {player_sport.level}"
+
+    def test_update_level(self, user: User) -> None:
+        sport = user.player.sports.first()
+        sport_level = random.choice(SportLevel.objects.all())
+        sport.update_level(sport_level)
+
+        assert sport.level == sport_level
 
 
 class TestPlayer:
-    def test_add_sport(self, user_without_sport: User) -> None:
+    def test_create_sport(self, user_without_sport: User) -> None:
         sport = random.choice(Sport.objects.all())
         sport_level = random.choice(SportLevel.objects.all())
         data = {
@@ -63,11 +70,11 @@ class TestPlayer:
             "level": sport_level,
         }
 
-        player_sport = user_without_sport.player.add_sport(data)
+        player_sport = user_without_sport.player.create_sport(data)
 
         assert user_without_sport.player.sports.filter(pk=player_sport.pk).exists()
 
-    def test_add_sport_when_has_same_sport(self, user: User) -> None:
+    def test_create_sport_when_has_same_sport(self, user: User) -> None:
         sport = user.player.sports.first().sport
         sport_level = random.choice(SportLevel.objects.all())
         data = {
@@ -77,4 +84,4 @@ class TestPlayer:
         }
 
         with pytest.raises(IntegrityError):
-            user.player.add_sport(data)
+            user.player.create_sport(data)

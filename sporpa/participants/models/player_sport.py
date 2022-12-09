@@ -47,3 +47,7 @@ class PlayerSport(models.Model):
 
     def __str__(self) -> str:
         return f"{self.player} - {self.sport} - {self.level}"
+
+    def update_level(self, level: "participant_models.SportLevel") -> None:
+        self.level = level
+        self.save()

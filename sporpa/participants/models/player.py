@@ -25,5 +25,5 @@ class Player(models.Model):
     def __str__(self) -> str:
         return f"{self.user}"
 
-    def add_sport(self, data: dict[str, Any]) -> "participant_models.PlayerSport":
+    def create_sport(self, data: dict[str, Any]) -> "participant_models.PlayerSport":
         return participant_models.PlayerSport.objects.create(**data)

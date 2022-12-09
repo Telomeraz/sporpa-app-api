@@ -7,7 +7,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.urls import reverse
 
 from accounts.models import User
-from participants.api.v1.views import PlayerSportView, SportLevelView, SportView
+from participants.api.v1.views import PlayerSportUpdateLevelView, PlayerSportView, SportLevelView, SportView
 from participants.models import Sport, SportLevel
 
 pytestmark = pytest.mark.django_db
@@ -78,3 +78,71 @@ class TestPlayerSportView:
         response = PlayerSportView.as_view()(request)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestPlayerSportUpdateLevelView:
+    def test_put(self, user: User) -> None:
+        sport_id = user.player.sports.first().sport_id
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "level": sport_level.pk,
+        }
+        request = request_factory.put(
+            reverse("participants:player_sports_update_level", kwargs={"sport_id": sport_id}),
+            data=data,
+        )
+        force_authenticate(request, user=user)
+        response = PlayerSportUpdateLevelView.as_view()(request, sport_id=sport_id)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["player"] == user.player.pk
+        assert response.data["sport"] == sport_id
+        assert response.data["level"] == sport_level.pk
+
+    def test_put_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
+        sport_id = random.choice(Sport.objects.all()).pk
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "level": sport_level.pk,
+        }
+        request = request_factory.put(
+            reverse("participants:player_sports_update_level", kwargs={"sport_id": sport_id}),
+            data=data,
+        )
+        force_authenticate(request, user=user_without_sport)
+        response = PlayerSportUpdateLevelView.as_view()(request, sport_id=sport_id)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_patch(self, user: User) -> None:
+        sport_id = user.player.sports.first().sport_id
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "level": sport_level.pk,
+        }
+        request = request_factory.patch(
+            reverse("participants:player_sports_update_level", kwargs={"sport_id": sport_id}),
+            data=data,
+        )
+        force_authenticate(request, user=user)
+        response = PlayerSportUpdateLevelView.as_view()(request, sport_id=sport_id)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["player"] == user.player.pk
+        assert response.data["sport"] == sport_id
+        assert response.data["level"] == sport_level.pk
+
+    def test_patch_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
+        sport_id = random.choice(Sport.objects.all()).pk
+        sport_level = random.choice(SportLevel.objects.all())
+        data = {
+            "level": sport_level.pk,
+        }
+        request = request_factory.patch(
+            reverse("participants:player_sports_update_level", kwargs={"sport_id": sport_id}),
+            data=data,
+        )
+        force_authenticate(request, user=user_without_sport)
+        response = PlayerSportUpdateLevelView.as_view()(request, sport_id=sport_id)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND

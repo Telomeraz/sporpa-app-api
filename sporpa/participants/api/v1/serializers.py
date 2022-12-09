@@ -37,7 +37,9 @@ class PlayerSportSerializer(serializers.ModelSerializer):
             "sport",
             "level",
         )
-        extra_kwargs = {"write_only": {"player": True}}
+        extra_kwargs = {
+            "write_only": {"player": True},
+        }
         validators = (
             serializers.UniqueTogetherValidator(
                 queryset=PlayerSport.objects.all(),
@@ -46,7 +48,25 @@ class PlayerSportSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data: dict[str, Any]) -> PlayerSport:
-        return validated_data["player"].add_sport(validated_data)
+        return validated_data["player"].create_sport(validated_data)
+
+
+class PlayerSportUpdateLevelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerSport
+        fields = (
+            "player",
+            "sport",
+            "level",
+        )
+        read_only_fields = ("sport",)
+        extra_kwargs = {
+            "write_only": {"player": True},
+        }
+
+    def update(self, instance: PlayerSport, validated_data: dict[str, Any]) -> PlayerSport:
+        instance.update_level(validated_data["level"])
+        return instance
 
 
 class PlayerSerializer(serializers.ModelSerializer):
