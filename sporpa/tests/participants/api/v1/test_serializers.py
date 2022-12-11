@@ -1,6 +1,9 @@
 import random
 
 import pytest
+from rest_framework.test import APIRequestFactory
+
+from django.urls import reverse
 
 from accounts.models import User
 from participants.api.v1.serializers import (
@@ -13,6 +16,7 @@ from participants.api.v1.serializers import (
 from participants.models import Sport, SportLevel
 
 pytestmark = pytest.mark.django_db
+request_factory = APIRequestFactory()
 
 
 class TestSportSerializer:
@@ -54,6 +58,7 @@ class TestPlayerSportSerializer:
         }
 
         serializer = PlayerSportSerializer(player_sport)
+        data.pop("player")
 
         assert serializer.data == data
 
@@ -66,7 +71,15 @@ class TestPlayerSportSerializer:
             "level": sport_level.pk,
         }
 
-        serializer = PlayerSportSerializer(data=data)
+        request = request_factory.post(
+            reverse("participants:player_sports"),
+            data=data,
+        )
+        request.user = user_without_sport
+        context = {
+            "request": request,
+        }
+        serializer = PlayerSportSerializer(data=data, context=context)
         assert serializer.is_valid()
 
         player_sport = serializer.save()
@@ -83,7 +96,15 @@ class TestPlayerSportSerializer:
             "level": sport_level.pk,
         }
 
-        serializer = PlayerSportSerializer(data=data)
+        request = request_factory.post(
+            reverse("participants:player_sports"),
+            data=data,
+        )
+        request.user = user
+        context = {
+            "request": request,
+        }
+        serializer = PlayerSportSerializer(data=data, context=context)
 
         assert serializer.is_valid() is False
 
@@ -98,7 +119,15 @@ class TestPlayerSportUpdateLevelSerializer:
             "level": sport_level.pk,
         }
 
-        serializer = PlayerSportUpdateLevelSerializer(instance=player_sport, data=data)
+        request = request_factory.put(
+            reverse("participants:player_sports_update_level", kwargs={"sport_id": sport.pk}),
+            data=data,
+        )
+        request.user = user
+        context = {
+            "request": request,
+        }
+        serializer = PlayerSportUpdateLevelSerializer(instance=player_sport, data=data, context=context)
         assert serializer.is_valid()
 
         player_sport = serializer.save()

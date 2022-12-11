@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from participants.models import Player, PlayerSport, Sport, SportLevel
 
+from .fields import CurrentPlayerDefault
+
 
 class SportSerializer(serializers.ModelSerializer):
     value = serializers.ChoiceField(source="name", choices=Sport.Name)
@@ -30,6 +32,8 @@ class SportLevelSerializer(serializers.ModelSerializer):
 
 
 class PlayerSportSerializer(serializers.ModelSerializer):
+    player = serializers.HiddenField(default=CurrentPlayerDefault())
+
     class Meta:
         model = PlayerSport
         fields = (
@@ -52,6 +56,8 @@ class PlayerSportSerializer(serializers.ModelSerializer):
 
 
 class PlayerSportUpdateLevelSerializer(serializers.ModelSerializer):
+    player = serializers.HiddenField(default=CurrentPlayerDefault())
+
     class Meta:
         model = PlayerSport
         fields = (

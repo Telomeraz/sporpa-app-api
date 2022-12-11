@@ -95,7 +95,6 @@ class TestPlayerSportUpdateLevelView:
         response = PlayerSportUpdateLevelView.as_view()(request, sport_id=sport_id)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["player"] == user.player.pk
         assert response.data["sport"] == sport_id
         assert response.data["level"] == sport_level.pk
 
@@ -128,7 +127,6 @@ class TestPlayerSportUpdateLevelView:
         response = PlayerSportUpdateLevelView.as_view()(request, sport_id=sport_id)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["player"] == user.player.pk
         assert response.data["sport"] == sport_id
         assert response.data["level"] == sport_level.pk
 
