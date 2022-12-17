@@ -7,11 +7,13 @@ class ActivityLevel(models.Model):
         "events.Activity",
         verbose_name=_("activity"),
         on_delete=models.CASCADE,
+        related_name="activity_levels",
     )
     level = models.ForeignKey(
         "participants.SportLevel",
         verbose_name=_("level"),
         on_delete=models.CASCADE,
+        related_name="activity_levels",
     )
 
     class Meta:

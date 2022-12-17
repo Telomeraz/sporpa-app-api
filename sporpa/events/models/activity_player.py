@@ -7,11 +7,13 @@ class ActivityPlayer(models.Model):
         "events.Activity",
         verbose_name=_("activity"),
         on_delete=models.CASCADE,
+        related_name="activity_players",
     )
     player_sport = models.ForeignKey(
         "participants.PlayerSport",
         verbose_name=_("player"),
         on_delete=models.CASCADE,
+        related_name="activity_players",
     )
     is_organizer = models.BooleanField(
         default=False,
