@@ -62,6 +62,18 @@ class Activity(TrackingMixin):
         db_table = "activity"
         verbose_name = _("activity")
         verbose_name_plural = _("activities")
+        constraints = (
+            models.CheckConstraint(
+                check=models.Q(available_between_at__lower_inf=False),
+                name="lower_cannot_be_infinite",
+                violation_error_message=_("available_between_at lower value cannot be infinite."),
+            ),
+            models.CheckConstraint(
+                check=models.Q(available_between_at__upper_inf=False),
+                name="upper_cannot_be_infinite",
+                violation_error_message=_("available_between_at upper value cannot be infinite."),
+            ),
+        )
 
     def __str__(self) -> str:
         return self.name
