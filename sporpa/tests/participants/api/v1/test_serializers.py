@@ -120,7 +120,7 @@ class TestPlayerSportUpdateLevelSerializer:
         }
 
         request = request_factory.put(
-            reverse("participants:player_sports_update_level", kwargs={"sport_id": sport.pk}),
+            reverse("participants:player_sports_update_level", kwargs={"sport_pk": sport.pk}),
             data=data,
         )
         request.user = user

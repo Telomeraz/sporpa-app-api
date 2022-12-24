@@ -20,7 +20,7 @@ urlpatterns = [
         name="player_sports",
     ),
     path(
-        "player-sports/<int:sport_id>/level/",
+        "player-sports/<int:sport_pk>/level/",
         PlayerSportUpdateLevelView.as_view(),
         name="player_sports_update_level",
     ),

@@ -21,9 +21,9 @@ class PlayerSportView(generics.CreateAPIView):
 
 class PlayerSportUpdateLevelView(generics.UpdateAPIView):
     serializer_class = PlayerSportUpdateLevelSerializer
-    lookup_field = "sport_id"
+    lookup_field = "sport_pk"
 
     def get_object(self) -> PlayerSport:
         player = self.request.user.player
-        sport_id = self.kwargs[self.lookup_field]
-        return generics.get_object_or_404(player.sports, sport=sport_id)
+        sport_pk = self.kwargs[self.lookup_field]
+        return generics.get_object_or_404(player.sports, sport=sport_pk)
