@@ -9,8 +9,8 @@ class ActivityPlayer(models.Model):
         on_delete=models.CASCADE,
         related_name="activity_players",
     )
-    player_sport = models.ForeignKey(
-        "participants.PlayerSport",
+    player = models.ForeignKey(
+        "participants.Player",
         verbose_name=_("player"),
         on_delete=models.CASCADE,
         related_name="activity_players",
@@ -32,4 +32,4 @@ class ActivityPlayer(models.Model):
         )
 
     def __str__(self) -> str:
-        return f"{self.activity} - {self.player_sport}"
+        return f"{self.activity} - {self.player}"

@@ -25,12 +25,12 @@ class Activity(TrackingMixin):
         through="events.ActivityLevel",
         through_fields=("activity", "level"),
     )
-    player_sports = models.ManyToManyField(
-        "participants.PlayerSport",
-        verbose_name=_("player sport"),
+    players = models.ManyToManyField(
+        "participants.Player",
+        verbose_name=_("player"),
         related_name="activities",
         through="events.ActivityPlayer",
-        through_fields=("activity", "player_sport"),
+        through_fields=("activity", "player"),
     )
     player_limit = models.PositiveSmallIntegerField(
         _("maximum number of players"),
