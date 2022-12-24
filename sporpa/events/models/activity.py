@@ -3,6 +3,7 @@ from django.core import validators
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from events.validators import validate_now_less_than_lower_value
 from utils.models import TrackingMixin
 
 
@@ -51,6 +52,7 @@ class Activity(TrackingMixin):
     )
     available_between_at = DateTimeRangeField(
         _("available between at"),
+        validators=(validate_now_less_than_lower_value,),
     )
     status = models.PositiveSmallIntegerField(
         _("status"),
