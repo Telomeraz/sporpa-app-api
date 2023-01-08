@@ -57,3 +57,83 @@ class TestActivityView:
         assert response.data["name"] == name
         assert response.data["about"] == about
         assert response.data["status"] == Activity.status.field.default
+
+    def test_create_when_user_does_not_have_sport(self, user_without_sport: User) -> None:
+        sport: Sport = Sport.objects.first()
+        sport_levels = SportLevel.objects.values_list(flat=True)
+        name = fake.text(max_nb_chars=Activity.name.field.max_length)
+        about = fake.text(max_nb_chars=Activity.about.field.max_length)
+        available_between_at = {
+            "lower": fake.date_time_between(start_date="+1d", end_date="+15d"),
+            "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
+        }
+
+        data = {
+            "name": name,
+            "about": about,
+            "sport": sport.pk,
+            "levels": sport_levels,
+            "available_between_at": available_between_at,
+        }
+        request = request_factory.post(
+            reverse("events:activities"),
+            data=data,
+        )
+        force_authenticate(request, user=user_without_sport)
+        response = ActivityView.as_view()(request)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_create_when_user_does_not_have_sport_level(self, user: User) -> None:
+        player_sport: PlayerSport = user.player.sports.first()
+        sport: Sport = player_sport.sport
+        sport_levels = SportLevel.objects.exclude(pk=player_sport.level.pk).values_list(flat=True)
+        name = fake.text(max_nb_chars=Activity.name.field.max_length)
+        about = fake.text(max_nb_chars=Activity.about.field.max_length)
+        available_between_at = {
+            "lower": fake.date_time_between(start_date="+1d", end_date="+15d"),
+            "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
+        }
+
+        data = {
+            "name": name,
+            "about": about,
+            "sport": sport.pk,
+            "levels": sport_levels,
+            "available_between_at": available_between_at,
+        }
+        request = request_factory.post(
+            reverse("events:activities"),
+            data=data,
+        )
+        force_authenticate(request, user=user)
+        response = ActivityView.as_view()(request)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_create_when_lower_value_less_than_now(self, user: User) -> None:
+        player_sport: PlayerSport = user.player.sports.first()
+        sport: Sport = player_sport.sport
+        sport_levels = (player_sport.level.pk,)
+        name = fake.text(max_nb_chars=Activity.name.field.max_length)
+        about = fake.text(max_nb_chars=Activity.about.field.max_length)
+        available_between_at = {
+            "lower": fake.date_time_between(start_date="-1d", end_date="-15d"),
+            "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
+        }
+
+        data = {
+            "name": name,
+            "about": about,
+            "sport": sport.pk,
+            "levels": sport_levels,
+            "available_between_at": available_between_at,
+        }
+        request = request_factory.post(
+            reverse("events:activities"),
+            data=data,
+        )
+        force_authenticate(request, user=user)
+        response = ActivityView.as_view()(request)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
