@@ -1,10 +1,21 @@
+from typing import Any
+
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core import validators
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from events.validators import validate_now_less_than_lower_value
-from utils.models import TrackingMixin
+from participants.models import Player
+from utils.models import TrackingManagerMixin, TrackingMixin
+
+
+class ActivityManager(TrackingManagerMixin):
+    def create(self, **kwargs: Any) -> "Activity":
+        organizer: Player = kwargs.pop("organizer")
+        activity: Activity = super().create(**kwargs)
+        activity.players.add(organizer, through_defaults={"is_organizer": True})
+        return activity
 
 
 class Activity(TrackingMixin):
@@ -59,6 +70,8 @@ class Activity(TrackingMixin):
         choices=Status.choices,
         default=Status.OPEN,
     )
+
+    objects = ActivityManager()
 
     class Meta:
         db_table = "activity"
