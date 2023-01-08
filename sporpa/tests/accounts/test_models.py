@@ -23,7 +23,6 @@ class TestUserManager:
     def test_create_user_when_empty_email(self) -> None:
         with pytest.raises(ValueError):
             User.objects.create_user(email="", password=fake.password())
-            assert True
 
     def test_create_superuser(self) -> None:
         user = User.objects.create_superuser(email=fake.email(), password=fake.password())
@@ -42,7 +41,6 @@ class TestUserManager:
     def test_create_superuser_when_is_superuser_false(self) -> None:
         with pytest.raises(ValueError):
             User.objects.create_superuser(email=fake.email(), password=fake.password(), is_superuser=False)
-            assert True
 
 
 @pytest.mark.parametrize("filename", [fake.file_name("image")])
