@@ -81,7 +81,7 @@ class TestPlayerSportView:
 
 
 class TestPlayerSportUpdateLevelView:
-    def test_put(self, user: User) -> None:
+    def test_update(self, user: User) -> None:
         sport_pk = user.player.sports.first().sport_id
         sport_level = random.choice(SportLevel.objects.all())
         data = {
@@ -98,7 +98,7 @@ class TestPlayerSportUpdateLevelView:
         assert response.data["sport"] == sport_pk
         assert response.data["level"] == sport_level.pk
 
-    def test_put_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
+    def test_update_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
         sport_pk = random.choice(Sport.objects.all()).pk
         sport_level = random.choice(SportLevel.objects.all())
         data = {
@@ -113,7 +113,7 @@ class TestPlayerSportUpdateLevelView:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_patch(self, user: User) -> None:
+    def test_partial_update(self, user: User) -> None:
         sport_pk = user.player.sports.first().sport_id
         sport_level = random.choice(SportLevel.objects.all())
         data = {
@@ -130,7 +130,7 @@ class TestPlayerSportUpdateLevelView:
         assert response.data["sport"] == sport_pk
         assert response.data["level"] == sport_level.pk
 
-    def test_patch_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
+    def test_partial_update_when_player_does_not_have_sport(self, user_without_sport: User) -> None:
         sport_pk = random.choice(Sport.objects.all()).pk
         sport_level = random.choice(SportLevel.objects.all())
         data = {
