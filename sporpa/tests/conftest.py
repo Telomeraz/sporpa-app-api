@@ -5,10 +5,10 @@ import pytest
 from faker import Faker
 from PIL import Image
 
-from django.utils import timezone
-
 from accounts.models import User
+from events.models import Activity
 from tests.accounts.factories import UserFactory
+from tests.events.factories import ActivityFactory
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -30,18 +30,8 @@ def user_without_sport() -> User:
 
 
 @pytest.fixture
-def passive_user() -> User:
-    return UserFactory(
-        is_active=False,
-        deleted_at=timezone.now(),
-    )
-
-
-@pytest.fixture
 def unverified_user() -> User:
-    return UserFactory(
-        email_address1__verified=False,
-    )
+    return UserFactory(email_address1__verified=False)
 
 
 @pytest.fixture
@@ -50,3 +40,8 @@ def image_file() -> tempfile._TemporaryFileWrapper:
     tmp_file = tempfile.NamedTemporaryFile(suffix=f".{fake.file_extension('image')}")
     image.save(tmp_file)
     return tmp_file
+
+
+@pytest.fixture
+def activity(user: User) -> Activity:
+    return ActivityFactory(organizer=user.player)
