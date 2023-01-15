@@ -7,7 +7,7 @@ from rest_framework.test import APIRequestFactory
 from django.urls import reverse
 
 from accounts.models import User
-from events.api.v1.serializers import ActivitySerializer
+from events.api.v1.serializers import ActivitySerializer, ActivityUpdateSerializer
 from events.models import Activity
 from participants.models import PlayerSport, Sport, SportLevel
 
@@ -149,3 +149,69 @@ class TestActivitySerializer:
         }
         serializer = ActivitySerializer(data=data, context=context)
         assert serializer.is_valid() is False
+
+
+class TestActivityUpdateSerializer:
+    def test_update(self, activity_without_players: Activity) -> None:
+        player_limit = random.randint(
+            Activity.player_limit.field.validators[0].limit_value,
+            Activity.player_limit.field.validators[1].limit_value,
+        )
+        name = fake.text(max_nb_chars=Activity.name.field.max_length)
+        about = fake.text(max_nb_chars=Activity.about.field.max_length)
+        available_between_at = {
+            "lower": fake.date_time_between(start_date="+1d", end_date="+15d"),
+            "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
+        }
+        status = random.choice(Activity.Status.values)
+
+        data = {
+            "player_limit": player_limit,
+            "name": name,
+            "about": about,
+            "available_between_at": available_between_at,
+            "status": status,
+        }
+        serializer = ActivityUpdateSerializer(instance=activity_without_players, data=data)
+        assert serializer.is_valid()
+
+        updated_activity_without_players: Activity = serializer.save()
+
+        assert updated_activity_without_players.player_limit == player_limit
+        assert updated_activity_without_players.name == name
+        assert updated_activity_without_players.about == about
+        assert updated_activity_without_players.available_between_at.lower == available_between_at["lower"]
+        assert updated_activity_without_players.available_between_at.upper == available_between_at["upper"]
+        assert updated_activity_without_players.status == status
+
+    def test_partial_update(self, activity_without_players: Activity) -> None:
+        player_limit = random.randint(
+            Activity.player_limit.field.validators[0].limit_value,
+            Activity.player_limit.field.validators[1].limit_value,
+        )
+        name = fake.text(max_nb_chars=Activity.name.field.max_length)
+        about = fake.text(max_nb_chars=Activity.about.field.max_length)
+        available_between_at = {
+            "lower": fake.date_time_between(start_date="+1d", end_date="+15d"),
+            "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
+        }
+        status = random.choice(Activity.Status.values)
+
+        data = {
+            "player_limit": player_limit,
+            "name": name,
+            "about": about,
+            "available_between_at": available_between_at,
+            "status": status,
+        }
+        serializer = ActivityUpdateSerializer(instance=activity_without_players, data=data, partial=True)
+        assert serializer.is_valid()
+
+        updated_activity_without_players: Activity = serializer.save()
+
+        assert updated_activity_without_players.player_limit == player_limit
+        assert updated_activity_without_players.name == name
+        assert updated_activity_without_players.about == about
+        assert updated_activity_without_players.available_between_at.lower == available_between_at["lower"]
+        assert updated_activity_without_players.available_between_at.upper == available_between_at["upper"]
+        assert updated_activity_without_players.status == status

@@ -59,3 +59,32 @@ class ActivitySerializer(serializers.ModelSerializer):
                 _(f"The player does not have the requested level for {sport.get_name_display()}."),
             )
         return validated_data
+
+
+class ActivityUpdateSerializer(serializers.ModelSerializer):
+    available_between_at = DateTimeRangeField(
+        validators=(validate_now_less_than_lower_value,),
+    )
+
+    class Meta:
+        model = Activity
+        fields = (
+            "pk",
+            "sport",
+            "levels",
+            "players",
+            "player_limit",
+            "name",
+            "about",
+            "available_between_at",
+            "status",
+        )
+        extra_kwargs = {
+            "sport": {"read_only": True},
+            "levels": {"read_only": True},
+            "players": {"read_only": True},
+        }
+
+    def validate_player_limit(self, value: int) -> int:
+        self.instance.check_player_limit(player_limit=value)
+        return value
