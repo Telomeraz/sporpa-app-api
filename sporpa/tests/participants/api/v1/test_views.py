@@ -1,7 +1,7 @@
 import random
 
 import pytest
-from rest_framework import status
+from rest_framework import status as http_status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
@@ -22,7 +22,7 @@ class TestSportView:
         force_authenticate(request, user=user)
         response = SportView.as_view()(request)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["results"]
         for data, sport in zip(response.data["results"], Sport.objects.all()):
             assert data["value"] == sport.pk
@@ -37,7 +37,7 @@ class TestSportLevelView:
         force_authenticate(request, user=user)
         response = SportLevelView.as_view()(request)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["results"]
         for data, sport_level in zip(response.data["results"], SportLevel.objects.all()):
             assert data["value"] == sport_level.pk
@@ -59,7 +59,7 @@ class TestPlayerSportView:
         force_authenticate(request, user=user_without_sport)
         response = PlayerSportView.as_view()(request)
 
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == http_status.HTTP_201_CREATED
         assert response.data["sport"] == sport.pk
         assert response.data["level"] == sport_level.pk
 
@@ -77,7 +77,7 @@ class TestPlayerSportView:
         force_authenticate(request, user=user)
         response = PlayerSportView.as_view()(request)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
 
 class TestPlayerSportUpdateLevelView:
@@ -94,7 +94,7 @@ class TestPlayerSportUpdateLevelView:
         force_authenticate(request, user=user)
         response = PlayerSportUpdateLevelView.as_view()(request, sport_pk=sport_pk)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["sport"] == sport_pk
         assert response.data["level"] == sport_level.pk
 
@@ -111,7 +111,7 @@ class TestPlayerSportUpdateLevelView:
         force_authenticate(request, user=user_without_sport)
         response = PlayerSportUpdateLevelView.as_view()(request, sport_pk=sport_pk)
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == http_status.HTTP_404_NOT_FOUND
 
     def test_partial_update(self, user: User) -> None:
         sport_pk = user.player.sports.first().sport_id
@@ -126,7 +126,7 @@ class TestPlayerSportUpdateLevelView:
         force_authenticate(request, user=user)
         response = PlayerSportUpdateLevelView.as_view()(request, sport_pk=sport_pk)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["sport"] == sport_pk
         assert response.data["level"] == sport_level.pk
 
@@ -143,4 +143,4 @@ class TestPlayerSportUpdateLevelView:
         force_authenticate(request, user=user_without_sport)
         response = PlayerSportUpdateLevelView.as_view()(request, sport_pk=sport_pk)
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == http_status.HTTP_404_NOT_FOUND

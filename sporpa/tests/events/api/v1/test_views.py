@@ -2,7 +2,7 @@ import random
 
 import pytest
 from faker import Faker
-from rest_framework import status
+from rest_framework import status as http_status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
@@ -49,7 +49,7 @@ class TestActivityView:
         force_authenticate(request, user=user)
         response = ActivityView.as_view()(request)
 
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == http_status.HTTP_201_CREATED
         assert response.data["pk"]
         assert response.data["sport"] == sport.pk
         assert response.data["levels"] == list(sport_levels)
@@ -82,7 +82,7 @@ class TestActivityView:
         force_authenticate(request, user=user_without_sport)
         response = ActivityView.as_view()(request)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
     def test_create_when_user_does_not_have_sport_level(self, user: User) -> None:
         player_sport: PlayerSport = user.player.sports.first()
@@ -109,7 +109,7 @@ class TestActivityView:
         force_authenticate(request, user=user)
         response = ActivityView.as_view()(request)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
     def test_create_when_lower_value_less_than_now(self, user: User) -> None:
         player_sport: PlayerSport = user.player.sports.first()
@@ -136,7 +136,7 @@ class TestActivityView:
         force_authenticate(request, user=user)
         response = ActivityView.as_view()(request)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
 
 class TestActivityUpdateView:
@@ -151,14 +151,14 @@ class TestActivityUpdateView:
             "lower": fake.date_time_between(start_date="+1d", end_date="+15d"),
             "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
         }
-        status_ = random.choice(Activity.Status.values)
+        status = random.choice(Activity.Status.values)
 
         data = {
             "player_limit": player_limit,
             "name": name,
             "about": about,
             "available_between_at": available_between_at,
-            "status": status_,
+            "status": status,
         }
         request = request_factory.put(
             reverse("events:activities_update", kwargs={"pk": activity.pk}),
@@ -167,11 +167,11 @@ class TestActivityUpdateView:
         force_authenticate(request, user=activity.organizer.user)
         response = ActivityUpdateView.as_view()(request, pk=activity.pk)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["player_limit"] == player_limit
         assert response.data["name"] == name
         assert response.data["about"] == about
-        assert response.data["status"] == status_
+        assert response.data["status"] == status
 
     def test_partial_update(self, activity: Activity) -> None:
         player_limit = random.randint(
@@ -184,14 +184,14 @@ class TestActivityUpdateView:
             "lower": fake.date_time_between(start_date="+1d", end_date="+15d"),
             "upper": fake.date_time_between(start_date="+16d", end_date="+30d"),
         }
-        status_ = random.choice(Activity.Status.values)
+        status = random.choice(Activity.Status.values)
 
         data = {
             "player_limit": player_limit,
             "name": name,
             "about": about,
             "available_between_at": available_between_at,
-            "status": status_,
+            "status": status,
         }
         request = request_factory.patch(
             reverse("events:activities_update", kwargs={"pk": activity.pk}),
@@ -200,8 +200,8 @@ class TestActivityUpdateView:
         force_authenticate(request, user=activity.organizer.user)
         response = ActivityUpdateView.as_view()(request, pk=activity.pk)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["player_limit"] == player_limit
         assert response.data["name"] == name
         assert response.data["about"] == about
-        assert response.data["status"] == status_
+        assert response.data["status"] == status

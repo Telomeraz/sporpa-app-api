@@ -2,7 +2,7 @@ import tempfile
 
 import pytest
 from faker import Faker
-from rest_framework import status
+from rest_framework import status as http_status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
@@ -24,7 +24,7 @@ class TestUserView:
         force_authenticate(request, user=user)
         response = UserView.as_view()(request, pk=user2.pk)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["first_name"] == user2.first_name
         assert response.data["last_name"] == user2.last_name
         assert response.data["avatar"] == request.build_absolute_uri(user2.avatar.url)
@@ -56,7 +56,7 @@ class TestUserView:
         force_authenticate(request, user=user)
         response = UserView.as_view()(request)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["first_name"] == user.first_name
         assert response.data["last_name"] == user.last_name
         assert response.data["avatar"] == request.build_absolute_uri(user.avatar.url)
@@ -82,7 +82,7 @@ class TestUserView:
         force_authenticate(request, user=user)
         response = UserView.as_view()(request)
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == http_status.HTTP_200_OK
         assert response.data["first_name"] == user.first_name
         assert response.data["last_name"] == user.last_name
         assert response.data["avatar"] == request.build_absolute_uri(user.avatar.url)
