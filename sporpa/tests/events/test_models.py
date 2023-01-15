@@ -5,7 +5,7 @@ from faker import Faker
 
 from accounts.models import User
 from events.models import Activity
-from participants.models import PlayerSport, Sport, SportLevel
+from participants.models import Player, PlayerSport, Sport, SportLevel
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -78,3 +78,9 @@ class TestActivityManager:
 class TestActivity:
     def test_str(self, activity_without_players: Activity) -> None:
         assert str(activity_without_players) == activity_without_players.name
+
+    def test_organizer(self, activity_without_players: Activity) -> None:
+        assert activity_without_players.organizer == Player.objects.get(
+            activity_players__is_organizer=True,
+            activities=activity_without_players,
+        )

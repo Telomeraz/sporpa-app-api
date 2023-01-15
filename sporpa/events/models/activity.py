@@ -2,6 +2,7 @@ from typing import Any
 
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -17,12 +18,20 @@ class ActivityManager(TrackingManagerMixin):
         activity.players.add(organizer, through_defaults={"is_organizer": True})
         return activity
 
+    def filter_organizer(self, organizer: Player | int) -> models.QuerySet:
+        return self.filter(
+            activity_players__is_organizer=True,
+            players=organizer,
+        )
+
 
 class Activity(TrackingMixin):
     class Status(models.IntegerChoices):
         OPEN = 1, _("Open")
         PLAYED = 2, _("Played")
         CANCELLED = 3, _("Cancelled")
+
+    UPDATABLE_STATUSES = (Status.OPEN,)
 
     sport = models.ForeignKey(
         "participants.Sport",
@@ -92,3 +101,19 @@ class Activity(TrackingMixin):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def organizer(self) -> Player:
+        return self.players.get(activity_players__is_organizer=True)
+
+    def check_player_limit(
+        self,
+        *,
+        player_limit: int | None = None,
+        total_players: int | None = None,
+    ) -> None:
+        player_limit = player_limit if player_limit is not None else self.player_limit
+        total_players = total_players if total_players is not None else len(self.players.all())
+
+        if player_limit < total_players:
+            raise ValidationError(_("Player limit cannot be less than total players."))
