@@ -43,5 +43,5 @@ def image_file() -> tempfile._TemporaryFileWrapper:
 
 
 @pytest.fixture
-def activity(user: User) -> Activity:
+def activity_without_players(user: User) -> Activity:
     return ActivityFactory(organizer=user.player)

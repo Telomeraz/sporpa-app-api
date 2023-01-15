@@ -76,5 +76,5 @@ class TestActivityManager:
 
 
 class TestActivity:
-    def test_str(self, activity: Activity) -> None:
-        assert str(activity) == activity.name
+    def test_str(self, activity_without_players: Activity) -> None:
+        assert str(activity_without_players) == activity_without_players.name
