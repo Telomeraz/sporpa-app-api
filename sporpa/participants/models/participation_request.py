@@ -29,6 +29,13 @@ class ParticipationRequest(models.Model):
         db_table = "participation_request"
         verbose_name = _("participation request")
         verbose_name_plural = _("participation requests")
+        constraints = (
+            models.UniqueConstraint(
+                fields=("activity", "participant"),
+                name="activity_participant_unique",
+                violation_error_message=_("You already sent a participation request."),
+            ),
+        )
 
     def __str__(self) -> str:
         return f"{self.participant}'s participation request"
