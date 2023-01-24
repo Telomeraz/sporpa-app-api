@@ -9,7 +9,7 @@ from accounts.models import User
 from participants.api.v1.serializers import (
     PlayerSerializer,
     PlayerSportSerializer,
-    PlayerSportUpdateLevelSerializer,
+    PlayerSportUpdateSerializer,
     SportLevelSerializer,
     SportSerializer,
 )
@@ -109,7 +109,7 @@ class TestPlayerSportSerializer:
         assert serializer.is_valid() is False
 
 
-class TestPlayerSportUpdateLevelSerializer:
+class TestPlayerSportUpdateSerializer:
     def test_update(self, user: User) -> None:
         player_sport = user.player.sports.first()
         sport = player_sport.sport
@@ -127,7 +127,7 @@ class TestPlayerSportUpdateLevelSerializer:
         context = {
             "request": request,
         }
-        serializer = PlayerSportUpdateLevelSerializer(instance=player_sport, data=data, context=context)
+        serializer = PlayerSportUpdateSerializer(instance=player_sport, data=data, context=context)
         assert serializer.is_valid()
 
         player_sport = serializer.save()

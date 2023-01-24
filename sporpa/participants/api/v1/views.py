@@ -2,25 +2,25 @@ from rest_framework import generics
 
 from participants.models import PlayerSport, Sport, SportLevel
 
-from .serializers import PlayerSportSerializer, PlayerSportUpdateLevelSerializer, SportLevelSerializer, SportSerializer
+from .serializers import PlayerSportSerializer, PlayerSportUpdateSerializer, SportLevelSerializer, SportSerializer
 
 
-class SportView(generics.ListAPIView):
+class SportListView(generics.ListAPIView):
     serializer_class = SportSerializer
     queryset = Sport.objects.all()
 
 
-class SportLevelView(generics.ListAPIView):
+class SportLevelListView(generics.ListAPIView):
     serializer_class = SportLevelSerializer
     queryset = SportLevel.objects.all()
 
 
-class PlayerSportView(generics.CreateAPIView):
+class PlayerSportCreateView(generics.CreateAPIView):
     serializer_class = PlayerSportSerializer
 
 
-class PlayerSportUpdateLevelView(generics.UpdateAPIView):
-    serializer_class = PlayerSportUpdateLevelSerializer
+class PlayerSportUpdateView(generics.UpdateAPIView):
+    serializer_class = PlayerSportUpdateSerializer
     lookup_field = "sport_pk"
 
     def get_object(self) -> PlayerSport:

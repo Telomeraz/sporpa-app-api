@@ -7,7 +7,7 @@ from rest_framework.test import APIRequestFactory
 from django.urls import reverse
 
 from accounts.models import User
-from events.api.v1.serializers import ActivitySerializer, ActivityUpdateSerializer
+from events.api.v1.serializers import ActivityCreateSerializer, ActivityUpdateSerializer
 from events.models import Activity
 from participants.models import PlayerSport, Sport, SportLevel
 
@@ -16,7 +16,7 @@ pytestmark = pytest.mark.django_db
 request_factory = APIRequestFactory()
 
 
-class TestActivitySerializer:
+class TestActivityCreateSerializer:
     def test_create(self, user: User) -> None:
         player_sport: PlayerSport = user.player.sports.first()
         sport: Sport = player_sport.sport
@@ -49,7 +49,7 @@ class TestActivitySerializer:
         context = {
             "request": request,
         }
-        serializer = ActivitySerializer(data=data, context=context)
+        serializer = ActivityCreateSerializer(data=data, context=context)
         assert serializer.is_valid()
 
         activity: Activity = serializer.save()
@@ -89,7 +89,7 @@ class TestActivitySerializer:
         context = {
             "request": request,
         }
-        serializer = ActivitySerializer(data=data, context=context)
+        serializer = ActivityCreateSerializer(data=data, context=context)
         assert serializer.is_valid() is False
 
     def test_create_when_user_does_not_have_sport_level(self, user: User) -> None:
@@ -118,7 +118,7 @@ class TestActivitySerializer:
         context = {
             "request": request,
         }
-        serializer = ActivitySerializer(data=data, context=context)
+        serializer = ActivityCreateSerializer(data=data, context=context)
         assert serializer.is_valid() is False
 
     def test_create_when_lower_value_less_than_now(self, user: User) -> None:
@@ -147,7 +147,7 @@ class TestActivitySerializer:
         context = {
             "request": request,
         }
-        serializer = ActivitySerializer(data=data, context=context)
+        serializer = ActivityCreateSerializer(data=data, context=context)
         assert serializer.is_valid() is False
 
 

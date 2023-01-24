@@ -55,7 +55,7 @@ class PlayerSportSerializer(serializers.ModelSerializer):
         return validated_data["player"].create_sport(validated_data)
 
 
-class PlayerSportUpdateLevelSerializer(serializers.ModelSerializer):
+class PlayerSportUpdateSerializer(serializers.ModelSerializer):
     player = serializers.HiddenField(default=CurrentPlayerDefault())
 
     class Meta:

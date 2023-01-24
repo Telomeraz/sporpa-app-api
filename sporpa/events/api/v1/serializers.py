@@ -11,7 +11,7 @@ from participants.api.v1.fields import CurrentPlayerDefault
 from participants.models import Player, PlayerSport, Sport, SportLevel
 
 
-class ActivitySerializer(serializers.ModelSerializer):
+class ActivityCreateSerializer(serializers.ModelSerializer):
     organizer = serializers.HiddenField(
         default=CurrentPlayerDefault(),
         write_only=True,

@@ -1,27 +1,27 @@
 from django.urls import path
 
-from .views import PlayerSportUpdateLevelView, PlayerSportView, SportLevelView, SportView
+from .views import PlayerSportCreateView, PlayerSportUpdateView, SportLevelListView, SportListView
 
 app_name = "participants"
 urlpatterns = [
     path(
         "sports/",
-        SportView.as_view(),
+        SportListView.as_view(),
         name="sports",
     ),
     path(
         "sport-levels/",
-        SportLevelView.as_view(),
+        SportLevelListView.as_view(),
         name="sport_levels",
     ),
     path(
         "player-sports/",
-        PlayerSportView.as_view(),
+        PlayerSportCreateView.as_view(),
         name="player_sports",
     ),
     path(
         "player-sports/<int:sport_pk>/level/",
-        PlayerSportUpdateLevelView.as_view(),
+        PlayerSportUpdateView.as_view(),
         name="player_sports_update_level",
     ),
 ]

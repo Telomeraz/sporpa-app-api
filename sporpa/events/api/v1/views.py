@@ -4,11 +4,11 @@ from django.db.models import QuerySet
 
 from events.models import Activity
 
-from .serializers import ActivitySerializer, ActivityUpdateSerializer
+from .serializers import ActivityCreateSerializer, ActivityUpdateSerializer
 
 
 class ActivityView(generics.CreateAPIView):
-    serializer_class = ActivitySerializer
+    serializer_class = ActivityCreateSerializer
 
 
 class ActivityUpdateView(generics.UpdateAPIView):
