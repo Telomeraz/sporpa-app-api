@@ -8,6 +8,12 @@ class ParticipationRequestManager(models.Manager):
     def filter_participant(self, participant: "participants_models.Player | int") -> models.QuerySet:
         return self.filter(participant=participant)
 
+    def filter_organizer(self, organizer: "participants_models.Player | int") -> models.QuerySet:
+        return self.filter(
+            activity__activity_players__is_organizer=True,
+            activity__players=organizer,
+        )
+
 
 class ParticipationRequest(models.Model):
     activity = models.ForeignKey(
