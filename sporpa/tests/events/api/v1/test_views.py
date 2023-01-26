@@ -8,9 +8,9 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.urls import reverse
 
 from accounts.models import User
-from events.api.v1.views import ActivityCreateView, ActivityUpdateView
+from events.api.v1.views import ActivityCreateView, ActivityUpdateView, ParticipationRequestListView
 from events.models import Activity
-from participants.models import PlayerSport, Sport, SportLevel
+from participants.models import ParticipationRequest, PlayerSport, Sport, SportLevel
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -205,3 +205,30 @@ class TestActivityUpdateView:
         assert response.data["name"] == name
         assert response.data["about"] == about
         assert response.data["status"] == status
+
+
+class TestParticipationRequestListView:
+    def test_list(self, participation_request: ParticipationRequest) -> None:
+        organizer = participation_request.activity.organizer
+        request = request_factory.get(
+            reverse("participants:participation_requests"),
+            kwargs={"activity_pk": participation_request.activity.pk},
+        )
+        force_authenticate(request, user=participation_request.activity.organizer.user)
+        response = ParticipationRequestListView.as_view()(request, activity_pk=participation_request.activity.pk)
+
+        assert response.status_code == http_status.HTTP_200_OK
+        assert response.data["results"]
+
+        for data, participation_request_ in zip(
+            response.data["results"],
+            ParticipationRequest.objects.filter_organizer(organizer),
+        ):
+            assert data["participant"]["pk"] == participation_request_.participant.pk
+            assert data["message"] == participation_request_.message
+            for data_, participant_sport in zip(
+                data["participant"]["sports"],
+                participation_request_.participant.sports.all(),
+            ):
+                assert data_["sport"] == participant_sport.sport.pk
+                assert data_["level"] == participant_sport.level.pk
