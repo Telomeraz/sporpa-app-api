@@ -83,7 +83,10 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ("sports",)
+        fields = (
+            "pk",
+            "sports",
+        )
 
 
 class ParticipationRequestListCreateSerializer(serializers.ModelSerializer):

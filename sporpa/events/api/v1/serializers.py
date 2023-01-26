@@ -8,7 +8,8 @@ from django.utils.translation import gettext
 from events.models import Activity
 from events.validators import validate_now_less_than_lower_value
 from participants.api.v1.fields import CurrentPlayerDefault
-from participants.models import Player, PlayerSport, Sport, SportLevel
+from participants.api.v1.serializers import PlayerSerializer
+from participants.models import ParticipationRequest, Player, PlayerSport, Sport, SportLevel
 
 
 class ActivityCreateSerializer(serializers.ModelSerializer):
@@ -88,3 +89,15 @@ class ActivityUpdateSerializer(serializers.ModelSerializer):
     def validate_player_limit(self, value: int) -> int:
         self.instance.check_player_limit(player_limit=value)
         return value
+
+
+class ParticipationRequestListSerializer(serializers.ModelSerializer):
+    participant = PlayerSerializer()
+
+    class Meta:
+        model = ParticipationRequest
+        fields = (
+            "participant",
+            "created_at",
+            "message",
+        )

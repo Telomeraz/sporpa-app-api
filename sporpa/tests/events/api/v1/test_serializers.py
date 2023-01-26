@@ -7,9 +7,13 @@ from rest_framework.test import APIRequestFactory
 from django.urls import reverse
 
 from accounts.models import User
-from events.api.v1.serializers import ActivityCreateSerializer, ActivityUpdateSerializer
+from events.api.v1.serializers import (
+    ActivityCreateSerializer,
+    ActivityUpdateSerializer,
+    ParticipationRequestListSerializer,
+)
 from events.models import Activity
-from participants.models import PlayerSport, Sport, SportLevel
+from participants.models import ParticipationRequest, PlayerSport, Sport, SportLevel
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -215,3 +219,17 @@ class TestActivityUpdateSerializer:
         assert updated_activity_without_participants.available_between_at.lower == available_between_at["lower"]
         assert updated_activity_without_participants.available_between_at.upper == available_between_at["upper"]
         assert updated_activity_without_participants.status == status
+
+
+class TestParticipationRequestListSerializer:
+    def test_data(self, participation_request: ParticipationRequest) -> None:
+        serializer = ParticipationRequestListSerializer(participation_request)
+
+        assert serializer.data["participant"]["pk"] == participation_request.participant.pk
+        assert serializer.data["message"] == participation_request.message
+        for data, participant_sport in zip(
+            serializer.data["participant"]["sports"],
+            participation_request.participant.sports.all(),
+        ):
+            assert data["sport"] == participant_sport.sport.pk
+            assert data["level"] == participant_sport.level.pk
