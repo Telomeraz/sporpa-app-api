@@ -3,6 +3,8 @@ import random
 import pytest
 from faker import Faker
 
+from django.core.exceptions import ValidationError
+
 from accounts.models import User
 from events.models import Activity
 from participants.models import Player, PlayerSport, Sport, SportLevel
@@ -84,3 +86,23 @@ class TestActivity:
             activity_players__is_organizer=True,
             activities=activity_without_players,
         )
+
+    @pytest.mark.parametrize(
+        "activity_with_participants",
+        [{"player_limit": 10}],
+        indirect=["activity_with_participants"],
+    )
+    def test_check_player_limit(self, user2: User, activity_with_participants: Activity) -> None:
+        activity_with_participants.check_player_limit(total_players=3)
+
+    @pytest.mark.parametrize(
+        "activity_with_participants",
+        [{"player_limit": 2}],
+        indirect=["activity_with_participants"],
+    )
+    def test_check_player_limit_when_player_limit_is_less(
+        self,
+        activity_with_participants: Activity,
+    ) -> None:
+        with pytest.raises(ValidationError, match="Player limit cannot be less than total players."):
+            activity_with_participants.check_player_limit(total_players=3)

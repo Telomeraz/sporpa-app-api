@@ -113,7 +113,7 @@ class Activity(TrackingMixin):
         total_players: int | None = None,
     ) -> None:
         player_limit = player_limit if player_limit is not None else self.player_limit
-        total_players = total_players if total_players is not None else len(self.players.all())
+        total_players = total_players if total_players is not None else self.players.count()
 
         if player_limit < total_players:
             raise ValidationError(_("Player limit cannot be less than total players."))
