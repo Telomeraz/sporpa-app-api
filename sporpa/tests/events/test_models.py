@@ -78,13 +78,13 @@ class TestActivityManager:
 
 
 class TestActivity:
-    def test_str(self, activity_without_players: Activity) -> None:
-        assert str(activity_without_players) == activity_without_players.name
+    def test_str(self, activity_without_participants: Activity) -> None:
+        assert str(activity_without_participants) == activity_without_participants.name
 
-    def test_organizer(self, activity_without_players: Activity) -> None:
-        assert activity_without_players.organizer == Player.objects.get(
+    def test_organizer(self, activity_without_participants: Activity) -> None:
+        assert activity_without_participants.organizer == Player.objects.get(
             activity_players__is_organizer=True,
-            activities=activity_without_players,
+            activities=activity_without_participants,
         )
 
     @pytest.mark.parametrize(
@@ -117,11 +117,11 @@ class TestActivity:
         ],
         indirect=["user", "user2"],
     )
-    def test_check_participant(self, user2: User, activity_without_players: Activity) -> None:
-        activity_without_players.check_participant(participant=user2.player)
+    def test_check_participant(self, user2: User, activity_without_participants: Activity) -> None:
+        activity_without_participants.check_participant(participant=user2.player)
 
     @pytest.mark.parametrize(
-        "user, user2, activity_without_players",
+        "user, user2, activity_without_participants",
         [
             (
                 {"player__sports__level_id": 4, "player_sports_size": 1, "player__sports__sport_id": 5},
@@ -129,15 +129,15 @@ class TestActivity:
                 {"status": 2},
             ),
         ],
-        indirect=["user", "user2", "activity_without_players"],
+        indirect=["user", "user2", "activity_without_participants"],
     )
     def test_check_participant_when_activity_status_is_not_updatable(
         self,
         user2: User,
-        activity_without_players: Activity,
+        activity_without_participants: Activity,
     ) -> None:
         with pytest.raises(ValidationError, match="The activity is already played."):
-            activity_without_players.check_participant(participant=user2.player)
+            activity_without_participants.check_participant(participant=user2.player)
 
     @pytest.mark.parametrize(
         "user, user2, activity_with_participants",
@@ -159,42 +159,42 @@ class TestActivity:
             activity_with_participants.check_participant(participant=user2.player)
 
     @pytest.mark.parametrize(
-        "user, activity_without_players",
+        "user, activity_without_participants",
         [
             (
                 {"player__sports__level_id": 5, "player_sports_size": 1, "player__sports__sport_id": 5},
                 {"player_limit": 2},
             ),
         ],
-        indirect=["user", "activity_without_players"],
+        indirect=["user", "activity_without_participants"],
     )
     def test_check_participant_when_organizer_is_participant(
         self,
-        activity_without_players: Activity,
+        activity_without_participants: Activity,
     ) -> None:
         with pytest.raises(ValidationError, match="You cannot send a participation request to your own activity."):
-            activity_without_players.check_participant(participant=activity_without_players.organizer)
+            activity_without_participants.check_participant(participant=activity_without_participants.organizer)
 
     @pytest.mark.parametrize(
-        "user, activity_without_players",
+        "user, activity_without_participants",
         [
             (
                 {"player__sports__level_id": 5, "player_sports_size": 1, "player__sports__sport_id": 2},
                 {"player_limit": 2},
             ),
         ],
-        indirect=["user", "activity_without_players"],
+        indirect=["user", "activity_without_participants"],
     )
     def test_check_participant_when_participant_does_not_have_sport(
         self,
         user_without_sport: User,
-        activity_without_players: Activity,
+        activity_without_participants: Activity,
     ) -> None:
         with pytest.raises(ValidationError, match="The player does not have Basketball record."):
-            activity_without_players.check_participant(participant=user_without_sport.player)
+            activity_without_participants.check_participant(participant=user_without_sport.player)
 
     @pytest.mark.parametrize(
-        "user, user2, activity_without_players",
+        "user, user2, activity_without_participants",
         [
             (
                 {"player__sports__level_id": 4, "player_sports_size": 1, "player__sports__sport_id": 5},
@@ -202,12 +202,12 @@ class TestActivity:
                 {"levels": (4,)},
             ),
         ],
-        indirect=["user", "user2", "activity_without_players"],
+        indirect=["user", "user2", "activity_without_participants"],
     )
     def test_check_participant_when_participant_level_is_not_eligible(
         self,
         user2: User,
-        activity_without_players: Activity,
+        activity_without_participants: Activity,
     ) -> None:
         with pytest.raises(ValidationError, match="Your level is not eligible for the activity."):
-            activity_without_players.check_participant(participant=user2.player)
+            activity_without_participants.check_participant(participant=user2.player)

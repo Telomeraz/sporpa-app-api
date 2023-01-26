@@ -140,7 +140,7 @@ class TestActivityView:
 
 
 class TestActivityUpdateView:
-    def test_update(self, activity_without_players: Activity) -> None:
+    def test_update(self, activity_without_participants: Activity) -> None:
         player_limit = random.randint(
             Activity.player_limit.field.validators[0].limit_value,
             Activity.player_limit.field.validators[1].limit_value,
@@ -161,11 +161,11 @@ class TestActivityUpdateView:
             "status": status,
         }
         request = request_factory.put(
-            reverse("events:activities_update", kwargs={"pk": activity_without_players.pk}),
+            reverse("events:activities_update", kwargs={"pk": activity_without_participants.pk}),
             data=data,
         )
-        force_authenticate(request, user=activity_without_players.organizer.user)
-        response = ActivityUpdateView.as_view()(request, pk=activity_without_players.pk)
+        force_authenticate(request, user=activity_without_participants.organizer.user)
+        response = ActivityUpdateView.as_view()(request, pk=activity_without_participants.pk)
 
         assert response.status_code == http_status.HTTP_200_OK
         assert response.data["player_limit"] == player_limit
@@ -173,7 +173,7 @@ class TestActivityUpdateView:
         assert response.data["about"] == about
         assert response.data["status"] == status
 
-    def test_partial_update(self, activity_without_players: Activity) -> None:
+    def test_partial_update(self, activity_without_participants: Activity) -> None:
         player_limit = random.randint(
             Activity.player_limit.field.validators[0].limit_value,
             Activity.player_limit.field.validators[1].limit_value,
@@ -194,11 +194,11 @@ class TestActivityUpdateView:
             "status": status,
         }
         request = request_factory.patch(
-            reverse("events:activities_update", kwargs={"pk": activity_without_players.pk}),
+            reverse("events:activities_update", kwargs={"pk": activity_without_participants.pk}),
             data=data,
         )
-        force_authenticate(request, user=activity_without_players.organizer.user)
-        response = ActivityUpdateView.as_view()(request, pk=activity_without_players.pk)
+        force_authenticate(request, user=activity_without_participants.organizer.user)
+        response = ActivityUpdateView.as_view()(request, pk=activity_without_participants.pk)
 
         assert response.status_code == http_status.HTTP_200_OK
         assert response.data["player_limit"] == player_limit

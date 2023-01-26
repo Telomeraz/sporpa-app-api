@@ -160,10 +160,10 @@ class TestParticipationRequestCreateSerializer:
         ],
         indirect=["user", "user2"],
     )
-    def test_create(self, user2: User, activity_without_players: Activity) -> None:
+    def test_create(self, user2: User, activity_without_participants: Activity) -> None:
         message = fake.text(max_nb_chars=ParticipationRequest.message.field.max_length)
         data = {
-            "activity": activity_without_players.pk,
+            "activity": activity_without_participants.pk,
             "message": message,
         }
 
@@ -180,7 +180,7 @@ class TestParticipationRequestCreateSerializer:
 
         participation_request: ParticipationRequest = serializer.save()
 
-        assert participation_request.activity == activity_without_players
+        assert participation_request.activity == activity_without_participants
         assert participation_request.participant == user2.player
         assert participation_request.message == message
 
@@ -197,11 +197,11 @@ class TestParticipationRequestCreateSerializer:
     def test_create_when_participant_already_sent_participation_request(
         self,
         user2: User,
-        activity_without_players: Activity,
+        activity_without_participants: Activity,
     ) -> None:
         message = fake.text(max_nb_chars=ParticipationRequest.message.field.max_length)
         data = {
-            "activity": activity_without_players.pk,
+            "activity": activity_without_participants.pk,
             "message": message,
         }
 

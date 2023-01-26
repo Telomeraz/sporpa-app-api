@@ -166,10 +166,10 @@ class TestParticipationRequestCreateView:
         ],
         indirect=["user", "user2"],
     )
-    def test_create(self, user2: User, activity_without_players: Activity) -> None:
+    def test_create(self, user2: User, activity_without_participants: Activity) -> None:
         message = fake.text(max_nb_chars=ParticipationRequest.message.field.max_length)
         data = {
-            "activity": activity_without_players.pk,
+            "activity": activity_without_participants.pk,
             "message": message,
         }
 
@@ -181,5 +181,5 @@ class TestParticipationRequestCreateView:
         response = ParticipationRequestCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_201_CREATED
-        assert response.data["activity"] == activity_without_players.pk
+        assert response.data["activity"] == activity_without_participants.pk
         assert response.data["message"] == message

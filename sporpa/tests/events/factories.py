@@ -23,7 +23,7 @@ class ActivityFactory(factory.django.DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class: Activity, *args: Any, **kwargs: Any) -> Activity:
-        players: Sequence[Player] = kwargs.pop("players", ())
+        participants: Sequence[Player] = kwargs.pop("participants", ())
         organizer: Player = kwargs["organizer"]
         player_sport: PlayerSport = kwargs.pop(
             "player_sport",
@@ -43,15 +43,15 @@ class ActivityFactory(factory.django.DjangoModelFactory):
             ),
         )
         sport_levels.add(player_sport.level)
-        for player in players:
-            sport_levels.add(player.sports.get(sport=sport).level)
+        for participant in participants:
+            sport_levels.add(participant.sports.get(sport=sport).level)
 
         if "player_limit" not in kwargs:
-            min_value = max(Activity.player_limit.field.validators[0].limit_value, len(players) + 1)
+            min_value = max(Activity.player_limit.field.validators[0].limit_value, len(participants) + 1)
             max_value: int = Activity.player_limit.field.validators[1].limit_value
             kwargs["player_limit"] = random.randint(min_value, max_value)
 
         activity: Activity = super()._create(model_class, *args, **kwargs)
         activity.levels.set(sport_levels)
-        activity.players.add(*players)
+        activity.players.add(*participants)
         return activity

@@ -46,7 +46,7 @@ def image_file() -> tempfile._TemporaryFileWrapper:
 
 
 @pytest.fixture
-def activity_without_players(request: SubRequest, user: User) -> Activity:
+def activity_without_participants(request: SubRequest, user: User) -> Activity:
     data = getattr(request, "param", {})
     return ActivityFactory(organizer=user.player, **data)
 
