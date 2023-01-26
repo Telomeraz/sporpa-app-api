@@ -1,9 +1,11 @@
 from rest_framework import generics
 
-from participants.models import PlayerSport, Sport, SportLevel
+from django.db.models import QuerySet
+
+from participants.models import ParticipationRequest, PlayerSport, Sport, SportLevel
 
 from .serializers import (
-    ParticipationRequestCreateSerializer,
+    ParticipationRequestListCreateSerializer,
     PlayerSportSerializer,
     PlayerSportUpdateSerializer,
     SportLevelSerializer,
@@ -35,5 +37,8 @@ class PlayerSportUpdateView(generics.UpdateAPIView):
         return generics.get_object_or_404(player.sports, sport=sport_pk)
 
 
-class ParticipationRequestCreateView(generics.CreateAPIView):
-    serializer_class = ParticipationRequestCreateSerializer
+class ParticipationRequestListCreateView(generics.ListCreateAPIView):
+    serializer_class = ParticipationRequestListCreateSerializer
+
+    def get_queryset(self) -> QuerySet[ParticipationRequest]:
+        return ParticipationRequest.objects.filter_participant(self.request.user.player)

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (
-    ParticipationRequestCreateView,
+    ParticipationRequestListCreateView,
     PlayerSportCreateView,
     PlayerSportUpdateView,
     SportLevelListView,
@@ -32,7 +32,7 @@ urlpatterns = [
     ),
     path(
         "participation-requests/",
-        ParticipationRequestCreateView.as_view(),
+        ParticipationRequestListCreateView.as_view(),
         name="participation_requests",
     ),
 ]

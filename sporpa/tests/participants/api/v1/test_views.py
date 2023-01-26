@@ -10,7 +10,7 @@ from django.urls import reverse
 from accounts.models import User
 from events.models import Activity
 from participants.api.v1.views import (
-    ParticipationRequestCreateView,
+    ParticipationRequestListCreateView,
     PlayerSportCreateView,
     PlayerSportUpdateView,
     SportLevelListView,
@@ -155,7 +155,24 @@ class TestPlayerSportUpdateView:
         assert response.status_code == http_status.HTTP_404_NOT_FOUND
 
 
-class TestParticipationRequestCreateView:
+class TestParticipationRequestListCreateView:
+    def test_list(self, participation_request: ParticipationRequest) -> None:
+        request = request_factory.get(
+            reverse("participants:participation_requests"),
+        )
+        force_authenticate(request, user=participation_request.participant.user)
+        response = ParticipationRequestListCreateView.as_view()(request)
+
+        assert response.status_code == http_status.HTTP_200_OK
+        assert response.data["results"]
+
+        for data, participation_request_ in zip(
+            response.data["results"],
+            ParticipationRequest.objects.filter_participant(participation_request.participant),
+        ):
+            assert data["activity"] == participation_request_.activity.pk
+            assert data["message"] == participation_request_.message
+
     @pytest.mark.parametrize(
         "user, user2",
         [
@@ -178,7 +195,7 @@ class TestParticipationRequestCreateView:
             data=data,
         )
         force_authenticate(request, user=user2)
-        response = ParticipationRequestCreateView.as_view()(request)
+        response = ParticipationRequestListCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_201_CREATED
         assert response.data["activity"] == activity_without_participants.pk
