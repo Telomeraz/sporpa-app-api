@@ -1,20 +1,24 @@
 import random
 
 import pytest
+from faker import Faker
 from rest_framework.test import APIRequestFactory
 
 from django.urls import reverse
 
 from accounts.models import User
+from events.models import Activity
 from participants.api.v1.serializers import (
+    ParticipationRequestCreateSerializer,
     PlayerSerializer,
     PlayerSportSerializer,
     PlayerSportUpdateSerializer,
     SportLevelSerializer,
     SportSerializer,
 )
-from participants.models import Sport, SportLevel
+from participants.models import ParticipationRequest, Sport, SportLevel
 
+fake = Faker()
 pytestmark = pytest.mark.django_db
 request_factory = APIRequestFactory()
 
@@ -143,3 +147,75 @@ class TestPlayerSerializer:
         for data, player_sport in zip(serializer.data["sports"], user.player.sports.all()):
             assert data["sport"] == player_sport.sport_id
             assert data["level"] == player_sport.level_id
+
+
+class TestParticipationRequestCreateSerializer:
+    @pytest.mark.parametrize(
+        "user, user2",
+        [
+            (
+                {"player__sports__level_id": 4, "player_sports_size": 1, "player__sports__sport_id": 3},
+                {"player__sports__level_id": 4, "player_sports_size": 1, "player__sports__sport_id": 3},
+            ),
+        ],
+        indirect=["user", "user2"],
+    )
+    def test_create(self, user2: User, activity_without_players: Activity) -> None:
+        message = fake.text(max_nb_chars=ParticipationRequest.message.field.max_length)
+        data = {
+            "activity": activity_without_players.pk,
+            "message": message,
+        }
+
+        request = request_factory.post(
+            reverse("participants:participation_requests"),
+            data=data,
+        )
+        request.user = user2
+        context = {
+            "request": request,
+        }
+        serializer = ParticipationRequestCreateSerializer(data=data, context=context)
+        assert serializer.is_valid()
+
+        participation_request: ParticipationRequest = serializer.save()
+
+        assert participation_request.activity == activity_without_players
+        assert participation_request.participant == user2.player
+        assert participation_request.message == message
+
+    @pytest.mark.parametrize(
+        "user, user2",
+        [
+            (
+                {"player__sports__level_id": 2, "player_sports_size": 1, "player__sports__sport_id": 5},
+                {"player__sports__level_id": 2, "player_sports_size": 1, "player__sports__sport_id": 5},
+            ),
+        ],
+        indirect=["user", "user2"],
+    )
+    def test_create_when_participant_already_sent_participation_request(
+        self,
+        user2: User,
+        activity_without_players: Activity,
+    ) -> None:
+        message = fake.text(max_nb_chars=ParticipationRequest.message.field.max_length)
+        data = {
+            "activity": activity_without_players.pk,
+            "message": message,
+        }
+
+        request = request_factory.post(
+            reverse("participants:participation_requests"),
+            data=data,
+        )
+        request.user = user2
+        context = {
+            "request": request,
+        }
+        serializer = ParticipationRequestCreateSerializer(data=data, context=context)
+        serializer.is_valid()
+        serializer.save()
+
+        serializer = ParticipationRequestCreateSerializer(data=data, context=context)
+        assert serializer.is_valid() is False

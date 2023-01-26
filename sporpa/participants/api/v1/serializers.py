@@ -2,7 +2,10 @@ from typing import Any
 
 from rest_framework import serializers
 
-from participants.models import Player, PlayerSport, Sport, SportLevel
+from django.utils.translation import gettext as _
+
+from events.models import Activity
+from participants.models import ParticipationRequest, Player, PlayerSport, Sport, SportLevel
 
 from .fields import CurrentPlayerDefault
 
@@ -81,3 +84,35 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ("sports",)
+
+
+class ParticipationRequestCreateSerializer(serializers.ModelSerializer):
+    participant = serializers.HiddenField(default=CurrentPlayerDefault())
+
+    class Meta:
+        model = ParticipationRequest
+        fields = (
+            "activity",
+            "participant",
+            "created_at",
+            "message",
+        )
+        extra_kwargs = {
+            "write_only": {"participant": True},
+            "read_only": {"created_at": True},
+        }
+        validators = (
+            serializers.UniqueTogetherValidator(
+                queryset=ParticipationRequest.objects.all(),
+                fields=("activity", "participant"),
+                message=_("You already sent a participation request."),
+            ),
+        )
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        validated_data = super().validate(attrs)
+        participant: Player = validated_data["participant"]
+        activity: Activity = validated_data["activity"]
+
+        activity.check_participant(participant=participant)
+        return validated_data
