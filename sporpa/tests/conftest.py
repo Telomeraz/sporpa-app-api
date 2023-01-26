@@ -2,6 +2,7 @@ import io
 import tempfile
 
 import pytest
+from _pytest.fixtures import SubRequest
 from faker import Faker
 from PIL import Image
 
@@ -15,13 +16,15 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def user() -> User:
-    return UserFactory()
+def user(request: SubRequest) -> User:
+    data = getattr(request, "param", {})
+    return UserFactory(**data)
 
 
 @pytest.fixture
-def user2() -> User:
-    return UserFactory()
+def user2(request: SubRequest) -> User:
+    data = getattr(request, "param", {})
+    return UserFactory(**data)
 
 
 @pytest.fixture
@@ -43,5 +46,22 @@ def image_file() -> tempfile._TemporaryFileWrapper:
 
 
 @pytest.fixture
-def activity_without_players(user: User) -> Activity:
-    return ActivityFactory(organizer=user.player)
+def activity_without_players(request: SubRequest, user: User) -> Activity:
+    data = getattr(request, "param", {})
+    return ActivityFactory(organizer=user.player, **data)
+
+
+@pytest.fixture
+def activity_with_participants(request: SubRequest, user: User) -> Activity:
+    data = getattr(request, "param", {})
+    total_participants = data.pop("total_participants", 1)
+    activity: Activity = ActivityFactory(organizer=user.player, **data)
+    for i in range(total_participants):
+        activity.players.add(
+            UserFactory(
+                player__sports__level=activity.levels.first(),
+                player_sports_size=1,
+                player__sports__sport=activity.sport,
+            ).player,
+        )
+    return activity

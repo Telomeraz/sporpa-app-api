@@ -1,3 +1,5 @@
+from typing import Any
+
 import factory
 import factory.django
 import factory.fuzzy
@@ -22,6 +24,11 @@ class PlayerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Player
         django_get_or_create = ("user",)
+
+    @classmethod
+    def _create(cls, model_class: Player, *args: Any, **kwargs: Any) -> Player:
+        cls.sports.size = kwargs.pop("sports_size", 2)
+        return super()._create(model_class, *args, **kwargs)
 
 
 class PlayerSportFactory(factory.django.DjangoModelFactory):

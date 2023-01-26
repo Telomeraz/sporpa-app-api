@@ -56,7 +56,7 @@ class TestUser:
         assert user.email == "testuser@example.com"
 
     def test_full_name(self) -> None:
-        user: User = UserFactory.build(
+        user: User = UserFactory(
             email=fake.email(),
             password=fake.password(),
             first_name="Adam",

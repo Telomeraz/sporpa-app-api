@@ -13,15 +13,15 @@ pytestmark = pytest.mark.django_db
 
 class TestUserSerializer:
     def test_update(self, user: User) -> None:
-        user_factory = UserFactory.build()
+        another_user = UserFactory()
         data = {
-            "email": user_factory.email,
-            "first_name": user_factory.first_name,
-            "last_name": user_factory.last_name,
-            "avatar": user_factory.avatar,
-            "birthdate": user_factory.birthdate,
-            "gender": user_factory.gender,
-            "about": user_factory.about,
+            "email": another_user.email,
+            "first_name": another_user.first_name,
+            "last_name": another_user.last_name,
+            "avatar": another_user.avatar,
+            "birthdate": another_user.birthdate,
+            "gender": another_user.gender,
+            "about": another_user.about,
         }
         serializer = UserSerializer(instance=user, data=data)
         assert serializer.is_valid()

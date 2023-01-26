@@ -1,3 +1,5 @@
+from typing import Any
+
 import factory
 import factory.django
 import factory.fuzzy
@@ -35,3 +37,8 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = User
+
+    @classmethod
+    def _create(cls, model_class: User, *args: Any, **kwargs: Any) -> User:
+        cls.player.defaults["sports_size"] = kwargs.pop("player_sports_size", 2)
+        return super()._create(model_class, *args, **kwargs)
