@@ -5,7 +5,7 @@ import pytest
 from django.db import IntegrityError
 
 from accounts.models import User
-from participants.models import PlayerSport, Sport, SportLevel
+from participants.models import ParticipationRequest, PlayerSport, Sport, SportLevel
 
 pytestmark = pytest.mark.django_db
 
@@ -85,3 +85,16 @@ class TestPlayer:
 
         with pytest.raises(IntegrityError):
             user.player.create_sport(data)
+
+
+class TestParticipationRequestManager:
+    def test_filter_participant(self, user2: User) -> User:
+        participation_requests = ParticipationRequest.objects.filter_participant(user2.player)
+        assert participation_requests.count() == ParticipationRequest.objects.filter(participant=user2.player).count()
+        for participation_request in participation_requests:
+            assert participation_request.participant == user2.player
+
+
+class TestParticipationRequest:
+    def test_str(self, participation_request: ParticipationRequest) -> None:
+        assert str(participation_request) == f"{participation_request.participant}'s participation request"

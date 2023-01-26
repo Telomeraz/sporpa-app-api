@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from participants import models as participants_models
+
+
+class ParticipationRequestManager(models.Manager):
+    def filter_participant(self, participant: "participants_models.Player | int") -> models.QuerySet:
+        return self.filter(participant=participant)
+
 
 class ParticipationRequest(models.Model):
     activity = models.ForeignKey(
@@ -24,6 +31,8 @@ class ParticipationRequest(models.Model):
         max_length=250,
         blank=True,
     )
+
+    objects = ParticipationRequestManager()
 
     class Meta:
         db_table = "participation_request"
