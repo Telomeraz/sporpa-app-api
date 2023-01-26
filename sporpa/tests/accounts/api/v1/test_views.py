@@ -8,7 +8,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.urls import reverse
 from django.utils.dateparse import parse_date
 
-from accounts.api.v1.views import UserView
+from accounts.api.v1.views import UserRetrieveUpdateView
 from accounts.models import User
 
 fake = Faker()
@@ -16,13 +16,13 @@ pytestmark = pytest.mark.django_db
 request_factory = APIRequestFactory()
 
 
-class TestUserView:
+class TestUserRetrieveUpdateView:
     def test_retrieve(self, user: User, user2: User) -> None:
         request = request_factory.get(
             reverse("accounts-users", kwargs={"pk": user2.pk}),
         )
         force_authenticate(request, user=user)
-        response = UserView.as_view()(request, pk=user2.pk)
+        response = UserRetrieveUpdateView.as_view()(request, pk=user2.pk)
 
         assert response.status_code == http_status.HTTP_200_OK
         assert response.data["first_name"] == user2.first_name
@@ -54,7 +54,7 @@ class TestUserView:
                 format="multipart",
             )
         force_authenticate(request, user=user)
-        response = UserView.as_view()(request)
+        response = UserRetrieveUpdateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_200_OK
         assert response.data["first_name"] == user.first_name
@@ -80,7 +80,7 @@ class TestUserView:
                 format="multipart",
             )
         force_authenticate(request, user=user)
-        response = UserView.as_view()(request)
+        response = UserRetrieveUpdateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_200_OK
         assert response.data["first_name"] == user.first_name

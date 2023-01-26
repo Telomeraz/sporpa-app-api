@@ -3,7 +3,7 @@ from faker import Faker
 
 from django.utils.dateparse import parse_date
 
-from accounts.api.v1.serializers import UserSerializer
+from accounts.api.v1.serializers import UserRetrieveUpdateSerializer
 from accounts.models import User
 from tests.accounts.factories import UserFactory
 
@@ -11,7 +11,7 @@ fake = Faker()
 pytestmark = pytest.mark.django_db
 
 
-class TestUserSerializer:
+class TestUserRetrieveUpdateSerializer:
     def test_update(self, user: User) -> None:
         another_user = UserFactory()
         data = {
@@ -23,7 +23,7 @@ class TestUserSerializer:
             "gender": another_user.gender,
             "about": another_user.about,
         }
-        serializer = UserSerializer(instance=user, data=data)
+        serializer = UserRetrieveUpdateSerializer(instance=user, data=data)
         assert serializer.is_valid()
 
         updated_user = serializer.save()
@@ -37,7 +37,7 @@ class TestUserSerializer:
         assert updated_user.about == user.about
 
     def test_data(self, user: User) -> None:
-        serializer = UserSerializer(instance=user)
+        serializer = UserRetrieveUpdateSerializer(instance=user)
 
         assert serializer.data["first_name"] == user.first_name
         assert serializer.data["last_name"] == user.last_name

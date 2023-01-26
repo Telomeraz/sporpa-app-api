@@ -8,7 +8,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.urls import reverse
 
 from accounts.models import User
-from events.api.v1.views import ActivityUpdateView, ActivityView
+from events.api.v1.views import ActivityCreateView, ActivityUpdateView
 from events.models import Activity
 from participants.models import PlayerSport, Sport, SportLevel
 
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.django_db
 request_factory = APIRequestFactory()
 
 
-class TestActivityView:
+class TestActivityCreateView:
     def test_create(self, user: User) -> None:
         player_sport: PlayerSport = user.player.sports.first()
         sport: Sport = player_sport.sport
@@ -47,7 +47,7 @@ class TestActivityView:
             data=data,
         )
         force_authenticate(request, user=user)
-        response = ActivityView.as_view()(request)
+        response = ActivityCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_201_CREATED
         assert response.data["pk"]
@@ -80,7 +80,7 @@ class TestActivityView:
             data=data,
         )
         force_authenticate(request, user=user_without_sport)
-        response = ActivityView.as_view()(request)
+        response = ActivityCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
@@ -107,7 +107,7 @@ class TestActivityView:
             data=data,
         )
         force_authenticate(request, user=user)
-        response = ActivityView.as_view()(request)
+        response = ActivityCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
@@ -134,7 +134,7 @@ class TestActivityView:
             data=data,
         )
         force_authenticate(request, user=user)
-        response = ActivityView.as_view()(request)
+        response = ActivityCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 

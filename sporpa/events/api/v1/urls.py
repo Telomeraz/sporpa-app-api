@@ -1,12 +1,12 @@
 from django.urls import path
 
-from .views import ActivityUpdateView, ActivityView
+from .views import ActivityCreateView, ActivityUpdateView
 
 app_name = "events"
 urlpatterns = [
     path(
         "activities/",
-        ActivityView.as_view(),
+        ActivityCreateView.as_view(),
         name="activities",
     ),
     path(

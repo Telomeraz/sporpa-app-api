@@ -4,7 +4,7 @@ from accounts.models import User
 from participants.api.v1.serializers import PlayerSerializer
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserRetrieveUpdateSerializer(serializers.ModelSerializer):
     player = PlayerSerializer(read_only=True)
 
     class Meta:

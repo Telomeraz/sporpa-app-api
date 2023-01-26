@@ -7,7 +7,7 @@ from events.models import Activity
 from .serializers import ActivityCreateSerializer, ActivityUpdateSerializer
 
 
-class ActivityView(generics.CreateAPIView):
+class ActivityCreateView(generics.CreateAPIView):
     serializer_class = ActivityCreateSerializer
 
 

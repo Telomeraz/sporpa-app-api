@@ -5,7 +5,7 @@ from dj_rest_auth.views import LoginView, LogoutView, PasswordChangeView, Passwo
 
 from django.urls import path
 
-from .views import GoogleLoginView, UserView
+from .views import GoogleLoginView, UserRetrieveUpdateView
 
 urlpatterns = [
     path(
@@ -80,12 +80,12 @@ urlpatterns = [
     ),
     path(
         "users/",
-        UserView.as_view(http_method_names=("post", "put")),
+        UserRetrieveUpdateView.as_view(http_method_names=("post", "put")),
         name="accounts-users",
     ),
     path(
         "users/<int:pk>/",
-        UserView.as_view(http_method_names=("get",)),
+        UserRetrieveUpdateView.as_view(http_method_names=("get",)),
         name="accounts-users",
     ),
 ]
