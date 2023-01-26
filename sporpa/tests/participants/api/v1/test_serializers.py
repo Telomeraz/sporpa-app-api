@@ -9,7 +9,7 @@ from django.urls import reverse
 from accounts.models import User
 from events.models import Activity
 from participants.api.v1.serializers import (
-    ParticipationRequestCreateSerializer,
+    ParticipationRequestListCreateSerializer,
     PlayerSerializer,
     PlayerSportSerializer,
     PlayerSportUpdateSerializer,
@@ -149,7 +149,18 @@ class TestPlayerSerializer:
             assert data["level"] == player_sport.level_id
 
 
-class TestParticipationRequestCreateSerializer:
+class TestParticipationRequestListCreateSerializer:
+    def test_data(self, participation_request: ParticipationRequest) -> None:
+        data = {
+            "activity": participation_request.activity.pk,
+            "message": participation_request.message,
+        }
+
+        serializer = ParticipationRequestListCreateSerializer(participation_request)
+
+        assert serializer.data["activity"] == data["activity"]
+        assert serializer.data["message"] == data["message"]
+
     @pytest.mark.parametrize(
         "user, user2",
         [
@@ -175,7 +186,7 @@ class TestParticipationRequestCreateSerializer:
         context = {
             "request": request,
         }
-        serializer = ParticipationRequestCreateSerializer(data=data, context=context)
+        serializer = ParticipationRequestListCreateSerializer(data=data, context=context)
         assert serializer.is_valid()
 
         participation_request: ParticipationRequest = serializer.save()
@@ -213,9 +224,9 @@ class TestParticipationRequestCreateSerializer:
         context = {
             "request": request,
         }
-        serializer = ParticipationRequestCreateSerializer(data=data, context=context)
+        serializer = ParticipationRequestListCreateSerializer(data=data, context=context)
         serializer.is_valid()
         serializer.save()
 
-        serializer = ParticipationRequestCreateSerializer(data=data, context=context)
+        serializer = ParticipationRequestListCreateSerializer(data=data, context=context)
         assert serializer.is_valid() is False

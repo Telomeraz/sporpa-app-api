@@ -86,7 +86,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = ("sports",)
 
 
-class ParticipationRequestCreateSerializer(serializers.ModelSerializer):
+class ParticipationRequestListCreateSerializer(serializers.ModelSerializer):
     participant = serializers.HiddenField(default=CurrentPlayerDefault())
 
     class Meta:
