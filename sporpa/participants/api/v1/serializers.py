@@ -2,7 +2,7 @@ from typing import Any
 
 from rest_framework import serializers
 
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext
 
 from events.models import Activity
 from participants.models import ParticipationRequest, Player, PlayerSport, Sport, SportLevel
@@ -105,7 +105,7 @@ class ParticipationRequestListCreateSerializer(serializers.ModelSerializer):
             serializers.UniqueTogetherValidator(
                 queryset=ParticipationRequest.objects.all(),
                 fields=("activity", "participant"),
-                message=_("You already sent a participation request."),
+                message=gettext("You already sent a participation request."),
             ),
         )
 

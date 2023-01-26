@@ -3,7 +3,7 @@ from typing import Any
 from drf_extra_fields.fields import DateTimeRangeField
 from rest_framework import serializers
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 
 from events.models import Activity
 from events.validators import validate_now_less_than_lower_value
@@ -50,13 +50,13 @@ class ActivityCreateSerializer(serializers.ModelSerializer):
             player_sport: PlayerSport = organizer.sports.get(sport=sport)
         except PlayerSport.DoesNotExist:
             raise serializers.ValidationError(
-                _(f"The player does not have {sport.get_name_display()} record."),
+                gettext(f"The player does not have {sport.get_name_display()} record."),
             )
 
         sport_levels: list[SportLevel] = validated_data["levels"]
         if player_sport.level not in sport_levels:
             raise serializers.ValidationError(
-                _(f"The player does not have the requested level for {sport.get_name_display()}."),
+                gettext(f"The player does not have the requested level for {sport.get_name_display()}."),
             )
         return validated_data
 

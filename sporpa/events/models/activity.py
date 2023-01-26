@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from events.validators import validate_now_less_than_lower_value
@@ -116,32 +117,32 @@ class Activity(TrackingMixin):
         total_players = total_players if total_players is not None else self.players.count()
 
         if player_limit < total_players:
-            raise ValidationError(_("Player limit cannot be less than total players."))
+            raise ValidationError(gettext("Player limit cannot be less than total players."))
 
     def check_participant(self, participant: Player) -> None:
         if self.status not in self.UPDATABLE_STATUSES:
             raise ValidationError(
-                _(f"The activity is already {self.get_status_display().lower()}."),
+                gettext(f"The activity is already {self.get_status_display().lower()}."),
             )
 
         if self.player_limit <= self.players.count():
             raise ValidationError(
-                _("The activity is fully booked."),
+                gettext("The activity is fully booked."),
             )
 
         if participant == self.organizer:
             raise ValidationError(
-                _("You cannot send a participation request to your own activity."),
+                gettext("You cannot send a participation request to your own activity."),
             )
 
         try:
             participant_sport = participant.sports.get(sport=self.sport)
         except PlayerSport.DoesNotExist:
             raise ValidationError(
-                _(f"The player does not have {self.sport.get_name_display()} record."),
+                gettext(f"The player does not have {self.sport.get_name_display()} record."),
             )
 
         if participant_sport.level not in self.levels.all():
             raise ValidationError(
-                _("Your level is not eligible for the activity."),
+                gettext("Your level is not eligible for the activity."),
             )

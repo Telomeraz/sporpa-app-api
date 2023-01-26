@@ -3,7 +3,7 @@ from allauth.account.models import EmailAddress
 from faker import Faker
 
 from django.core import mail
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 
 from accounts.models import User, user_directory_path
 from tests.accounts.factories import UserFactory
@@ -79,8 +79,8 @@ class TestUser:
         assert has_verified_email_address == unverified_user.has_verified_email_address
 
     def test_email_user(self, user: User) -> None:
-        subject = _("Test Subject")
-        message = _("Test Message")
+        subject = gettext("Test Subject")
+        message = gettext("Test Message")
         num_sent = user.email_user(subject=subject, message=message)
         assert num_sent == 1
         assert subject == mail.outbox[0].subject
