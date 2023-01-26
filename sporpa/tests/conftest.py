@@ -8,8 +8,10 @@ from PIL import Image
 
 from accounts.models import User
 from events.models import Activity
+from participants.models import ParticipationRequest
 from tests.accounts.factories import UserFactory
 from tests.events.factories import ActivityFactory
+from tests.participants.factories import ParticipationRequestFactory
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -65,3 +67,11 @@ def activity_with_participants(request: SubRequest, user: User) -> Activity:
             ).player,
         )
     return activity
+
+
+@pytest.fixture
+def participation_request(user2, activity_without_participants: Activity) -> ParticipationRequest:
+    return ParticipationRequestFactory(
+        activity=activity_without_participants,
+        participant=user2.player,
+    )

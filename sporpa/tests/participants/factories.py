@@ -4,7 +4,7 @@ import factory
 import factory.django
 import factory.fuzzy
 
-from participants.models import Player, PlayerSport, Sport, SportLevel
+from participants.models import ParticipationRequest, Player, PlayerSport, Sport, SportLevel
 
 
 class SportLevelFactory(factory.django.DjangoModelFactory):
@@ -39,3 +39,10 @@ class PlayerSportFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = PlayerSport
+
+
+class ParticipationRequestFactory(factory.django.DjangoModelFactory):
+    message = factory.Faker("text", max_nb_chars=ParticipationRequest.message.field.max_length)
+
+    class Meta:
+        model = ParticipationRequest
