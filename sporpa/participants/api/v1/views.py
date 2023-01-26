@@ -2,7 +2,13 @@ from rest_framework import generics
 
 from participants.models import PlayerSport, Sport, SportLevel
 
-from .serializers import PlayerSportSerializer, PlayerSportUpdateSerializer, SportLevelSerializer, SportSerializer
+from .serializers import (
+    ParticipationRequestCreateSerializer,
+    PlayerSportSerializer,
+    PlayerSportUpdateSerializer,
+    SportLevelSerializer,
+    SportSerializer,
+)
 
 
 class SportListView(generics.ListAPIView):
@@ -27,3 +33,7 @@ class PlayerSportUpdateView(generics.UpdateAPIView):
         player = self.request.user.player
         sport_pk = self.kwargs[self.lookup_field]
         return generics.get_object_or_404(player.sports, sport=sport_pk)
+
+
+class ParticipationRequestCreateView(generics.CreateAPIView):
+    serializer_class = ParticipationRequestCreateSerializer

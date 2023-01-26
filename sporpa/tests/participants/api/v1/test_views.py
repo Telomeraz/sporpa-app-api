@@ -1,15 +1,24 @@
 import random
 
 import pytest
+from faker import Faker
 from rest_framework import status as http_status
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from django.urls import reverse
 
 from accounts.models import User
-from participants.api.v1.views import PlayerSportCreateView, PlayerSportUpdateView, SportLevelListView, SportListView
-from participants.models import Sport, SportLevel
+from events.models import Activity
+from participants.api.v1.views import (
+    ParticipationRequestCreateView,
+    PlayerSportCreateView,
+    PlayerSportUpdateView,
+    SportLevelListView,
+    SportListView,
+)
+from participants.models import ParticipationRequest, Sport, SportLevel
 
+fake = Faker()
 pytestmark = pytest.mark.django_db
 request_factory = APIRequestFactory()
 
@@ -144,3 +153,33 @@ class TestPlayerSportUpdateView:
         response = PlayerSportUpdateView.as_view()(request, sport_pk=sport_pk)
 
         assert response.status_code == http_status.HTTP_404_NOT_FOUND
+
+
+class TestParticipationRequestCreateView:
+    @pytest.mark.parametrize(
+        "user, user2",
+        [
+            (
+                {"player__sports__level_id": 1, "player_sports_size": 1, "player__sports__sport_id": 1},
+                {"player__sports__level_id": 1, "player_sports_size": 1, "player__sports__sport_id": 1},
+            ),
+        ],
+        indirect=["user", "user2"],
+    )
+    def test_create(self, user2: User, activity_without_players: Activity) -> None:
+        message = fake.text(max_nb_chars=ParticipationRequest.message.field.max_length)
+        data = {
+            "activity": activity_without_players.pk,
+            "message": message,
+        }
+
+        request = request_factory.post(
+            reverse("participants:participation_requests"),
+            data=data,
+        )
+        force_authenticate(request, user=user2)
+        response = ParticipationRequestCreateView.as_view()(request)
+
+        assert response.status_code == http_status.HTTP_201_CREATED
+        assert response.data["activity"] == activity_without_players.pk
+        assert response.data["message"] == message
