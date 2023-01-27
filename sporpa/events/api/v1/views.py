@@ -47,7 +47,7 @@ class ParticipationRequestApprovalView(views.APIView):
             pk=pk,
         )
         if result == "accept":
-            participation_request.activity.accept_participant_request(participation_request)
+            participation_request.activity.accept_participation_request(participation_request)
         else:
-            participation_request.activity.reject_participant_request(participation_request)
+            participation_request.activity.reject_participation_request(participation_request)
         return Response({}, status=http_status.HTTP_204_NO_CONTENT)

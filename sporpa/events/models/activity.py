@@ -3,12 +3,12 @@ from typing import Any
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core import validators
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from events.validators import validate_now_less_than_lower_value
-from participants.models import Player, PlayerSport
+from participants.models import ParticipationRequest, Player, PlayerSport
 from utils.models import TrackingManagerMixin, TrackingMixin
 
 
@@ -146,3 +146,11 @@ class Activity(TrackingMixin):
             raise ValidationError(
                 gettext("Your level is not eligible for the activity."),
             )
+
+    @transaction.atomic
+    def accept_participation_request(self, participation_request: ParticipationRequest) -> None:
+        self.players.add(participation_request.participant)
+        participation_request.delete()
+
+    def reject_participation_request(self, participation_request: ParticipationRequest) -> None:
+        participation_request.delete()

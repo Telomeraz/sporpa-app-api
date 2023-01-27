@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 from accounts.models import User
 from events.models import Activity
-from participants.models import Player, PlayerSport, Sport, SportLevel
+from participants.models import ParticipationRequest, Player, PlayerSport, Sport, SportLevel
 
 fake = Faker()
 pytestmark = pytest.mark.django_db
@@ -211,3 +211,23 @@ class TestActivity:
     ) -> None:
         with pytest.raises(ValidationError, match="Your level is not eligible for the activity."):
             activity_without_participants.check_participant(participant=user2.player)
+
+    def test_accept_participation_request(self, participation_request: ParticipationRequest) -> None:
+        activity = participation_request.activity
+        participant = participation_request.participant
+
+        activity.accept_participation_request(participation_request)
+
+        assert activity.players.contains(participant)
+        with pytest.raises(ParticipationRequest.DoesNotExist):
+            participation_request.refresh_from_db()
+
+    def test_reject_participation_request(self, participation_request: ParticipationRequest) -> None:
+        activity = participation_request.activity
+        participant = participation_request.participant
+
+        activity.reject_participation_request(participation_request)
+
+        assert not activity.players.contains(participant)
+        with pytest.raises(ParticipationRequest.DoesNotExist):
+            participation_request.refresh_from_db()
