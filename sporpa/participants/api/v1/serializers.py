@@ -95,6 +95,7 @@ class ParticipationRequestListCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParticipationRequest
         fields = (
+            "pk",
             "activity",
             "participant",
             "created_at",

@@ -8,7 +8,12 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from django.urls import reverse
 
 from accounts.models import User
-from events.api.v1.views import ActivityCreateView, ActivityUpdateView, ParticipationRequestListView
+from events.api.v1.views import (
+    ActivityCreateView,
+    ActivityUpdateView,
+    ParticipationRequestApprovalView,
+    ParticipationRequestListView,
+)
 from events.models import Activity
 from participants.models import ParticipationRequest, PlayerSport, Sport, SportLevel
 
@@ -211,10 +216,12 @@ class TestParticipationRequestListView:
     def test_list(self, participation_request: ParticipationRequest) -> None:
         organizer = participation_request.activity.organizer
         request = request_factory.get(
-            reverse("participants:participation_requests"),
-            kwargs={"activity_pk": participation_request.activity.pk},
+            reverse(
+                "events:participation_requests",
+                kwargs={"activity_pk": participation_request.activity.pk},
+            )
         )
-        force_authenticate(request, user=participation_request.activity.organizer.user)
+        force_authenticate(request, user=organizer.user)
         response = ParticipationRequestListView.as_view()(request, activity_pk=participation_request.activity.pk)
 
         assert response.status_code == http_status.HTTP_200_OK
@@ -232,3 +239,45 @@ class TestParticipationRequestListView:
             ):
                 assert data_["sport"] == participant_sport.sport.pk
                 assert data_["level"] == participant_sport.level.pk
+
+
+class TestParticipationRequestApprovalView:
+    def test_post_when_result_is_accept(self, participation_request: ParticipationRequest) -> None:
+        activity = participation_request.activity
+        organizer = activity.organizer
+        participant = participation_request.participant
+        result = "accept"
+
+        request = request_factory.post(
+            reverse(
+                "events:participation_requests_approval",
+                kwargs={"pk": participation_request.pk, "result": result},
+            ),
+        )
+        force_authenticate(request, user=organizer.user)
+        response = ParticipationRequestApprovalView.as_view()(request, pk=participation_request.pk, result=result)
+
+        assert response.status_code == http_status.HTTP_204_NO_CONTENT
+        assert activity.players.contains(participant)
+        with pytest.raises(ParticipationRequest.DoesNotExist):
+            participation_request.refresh_from_db()
+
+    def test_post_when_result_is_reject(self, participation_request: ParticipationRequest) -> None:
+        activity = participation_request.activity
+        organizer = activity.organizer
+        participant = participation_request.participant
+        result = "reject"
+
+        request = request_factory.post(
+            reverse(
+                "events:participation_requests_approval",
+                kwargs={"pk": participation_request.pk, "result": result},
+            ),
+        )
+        force_authenticate(request, user=organizer.user)
+        response = ParticipationRequestApprovalView.as_view()(request, pk=participation_request.pk, result=result)
+
+        assert response.status_code == http_status.HTTP_204_NO_CONTENT
+        assert not activity.players.contains(participant)
+        with pytest.raises(ParticipationRequest.DoesNotExist):
+            participation_request.refresh_from_db()
