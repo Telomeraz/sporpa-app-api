@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from django.utils.translation import gettext
 
+from accounts.models import User
 from events.models import Activity
 from events.validators import validate_now_less_than_lower_value
 from participants.api.v1.fields import CurrentPlayerDefault
@@ -102,3 +103,51 @@ class ParticipationRequestListSerializer(serializers.ModelSerializer):
             "created_at",
             "message",
         )
+
+
+class UserInnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "avatar",
+        )
+
+
+class PlayerInnerSerializer(serializers.ModelSerializer):
+    user = UserInnerSerializer()
+
+    class Meta:
+        model = Player
+        fields = (
+            "pk",
+            "user",
+        )
+
+
+class ParticipatedActivityListSerializer(serializers.ModelSerializer):
+    organizer = PlayerInnerSerializer(read_only=True)
+    participants = PlayerInnerSerializer(read_only=True, many=True)
+    available_between_at = DateTimeRangeField()
+
+    class Meta:
+        model = Activity
+        fields = (
+            "pk",
+            "sport",
+            "levels",
+            "organizer",
+            "participants",
+            "player_limit",
+            "name",
+            "about",
+            "available_between_at",
+            "status",
+        )
+        extra_kwargs = {
+            "levels": {
+                "read_only": False,
+                "queryset": SportLevel.objects.all(),
+            },
+        }

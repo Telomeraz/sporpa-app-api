@@ -10,6 +10,7 @@ from accounts.models import User
 from events.api.v1.serializers import (
     ActivityCreateSerializer,
     ActivityUpdateSerializer,
+    ParticipatedActivityListSerializer,
     ParticipationRequestListSerializer,
 )
 from events.models import Activity
@@ -233,3 +234,33 @@ class TestParticipationRequestListSerializer:
         ):
             assert data["sport"] == participant_sport.sport.pk
             assert data["level"] == participant_sport.level.pk
+
+
+class TestParticipatedActivityListSerializer:
+    def test_data(self, activity_with_participants: Activity) -> None:
+        activity_with_participants.refresh_from_db()
+        serializer = ParticipatedActivityListSerializer(activity_with_participants)
+
+        organizer = activity_with_participants.organizer
+        participants = activity_with_participants.participants
+
+        assert serializer.data["pk"] == activity_with_participants.pk
+        assert serializer.data["sport"] == activity_with_participants.sport.pk
+        assert serializer.data["levels"] == list(activity_with_participants.levels.values_list("pk", flat=True))
+
+        assert serializer.data["organizer"]["pk"] == organizer.pk
+        assert serializer.data["organizer"]["user"]["first_name"] == organizer.user.first_name
+        assert serializer.data["organizer"]["user"]["last_name"] == organizer.user.last_name
+
+        for data_, participant in zip(
+            serializer.data["participants"],
+            participants,
+        ):
+            assert data_["pk"] == participant.pk
+            assert data_["user"]["first_name"] == participant.user.first_name
+            assert data_["user"]["last_name"] == participant.user.last_name
+
+        assert serializer.data["player_limit"] == activity_with_participants.player_limit
+        assert serializer.data["name"] == activity_with_participants.name
+        assert serializer.data["about"] == activity_with_participants.about
+        assert serializer.data["status"] == activity_with_participants.status
