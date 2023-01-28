@@ -70,8 +70,13 @@ def activity_with_participants(request: SubRequest, user: User) -> Activity:
 
 
 @pytest.fixture
-def participation_request(user2, activity_without_participants: Activity) -> ParticipationRequest:
+def participation_request(activity_without_participants: Activity) -> ParticipationRequest:
+    participant_user = UserFactory(
+        player__sports__sport=activity_without_participants.sport,
+        player__sports__level=activity_without_participants.levels.first(),
+        player_sports_size=1,
+    )
     return ParticipationRequestFactory(
         activity=activity_without_participants,
-        participant=user2.player,
+        participant=participant_user.player,
     )

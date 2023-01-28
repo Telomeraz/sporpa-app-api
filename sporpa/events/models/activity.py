@@ -147,10 +147,11 @@ class Activity(TrackingMixin):
                 gettext("Your level is not eligible for the activity."),
             )
 
-    @transaction.atomic
     def accept_participation_request(self, participation_request: ParticipationRequest) -> None:
-        self.players.add(participation_request.participant)
-        participation_request.delete()
+        self.check_participant(participation_request.participant)
+        with transaction.atomic():
+            self.players.add(participation_request.participant)
+            participation_request.delete()
 
     def reject_participation_request(self, participation_request: ParticipationRequest) -> None:
         participation_request.delete()
