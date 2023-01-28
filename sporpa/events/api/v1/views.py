@@ -10,7 +10,12 @@ from django.db.models import QuerySet
 from events.models import Activity
 from participants.models import ParticipationRequest
 
-from .serializers import ActivityCreateSerializer, ActivityUpdateSerializer, ParticipationRequestListSerializer
+from .serializers import (
+    ActivityCreateSerializer,
+    ActivityUpdateSerializer,
+    ParticipatedActivityListSerializer,
+    ParticipationRequestListSerializer,
+)
 
 
 class ActivityCreateView(generics.CreateAPIView):
@@ -51,3 +56,10 @@ class ParticipationRequestApprovalView(views.APIView):
         else:
             participation_request.activity.reject_participation_request(participation_request)
         return Response({}, status=http_status.HTTP_204_NO_CONTENT)
+
+
+class ParticipatedActivityListView(generics.ListAPIView):
+    serializer_class = ParticipatedActivityListSerializer
+
+    def get_queryset(self) -> QuerySet[Activity]:
+        return Activity.objects.filter(players=self.request.user.player)
