@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from participants import models as participants_models
@@ -48,7 +49,7 @@ class ParticipationRequest(models.Model):
             models.UniqueConstraint(
                 fields=("activity", "participant"),
                 name="activity_participant_unique",
-                violation_error_message=_("You already sent a participation request."),
+                violation_error_message=gettext("You already sent a participation request."),
             ),
         )
 

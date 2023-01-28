@@ -88,13 +88,13 @@ class TestPlayer:
 
 
 class TestParticipationRequestManager:
-    def test_filter_participant(self, user2: User) -> User:
+    def test_filter_participant(self, user2: User) -> None:
         participation_requests = ParticipationRequest.objects.filter_participant(user2.player)
         assert participation_requests.count() == ParticipationRequest.objects.filter(participant=user2.player).count()
         for participation_request in participation_requests:
             assert participation_request.participant == user2.player
 
-    def test_filter_organizer(self, user: User) -> User:
+    def test_filter_organizer(self, user: User) -> None:
         participation_requests = ParticipationRequest.objects.filter_organizer(user.player)
         assert (
             participation_requests.count()

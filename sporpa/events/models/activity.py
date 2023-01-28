@@ -91,12 +91,12 @@ class Activity(TrackingMixin):
             models.CheckConstraint(
                 check=models.Q(available_between_at__lower_inf=False),
                 name="lower_cannot_be_infinite",
-                violation_error_message=_("available_between_at lower value cannot be infinite."),
+                violation_error_message=gettext("available_between_at lower value cannot be infinite."),
             ),
             models.CheckConstraint(
                 check=models.Q(available_between_at__upper_inf=False),
                 name="upper_cannot_be_infinite",
-                violation_error_message=_("available_between_at upper value cannot be infinite."),
+                violation_error_message=gettext("available_between_at upper value cannot be infinite."),
             ),
         )
 
