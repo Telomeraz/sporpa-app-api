@@ -10,6 +10,7 @@ from django.db.models import QuerySet
 from events.models import Activity
 from participants.models import ParticipationRequest
 
+from .filtersets import ActivityListFilterset
 from .serializers import (
     ActivityCreateSerializer,
     ActivityUpdateSerializer,
@@ -60,6 +61,7 @@ class ParticipationRequestApprovalView(views.APIView):
 
 class ParticipatedActivityListView(generics.ListAPIView):
     serializer_class = ParticipatedActivityListSerializer
+    filterset_class = ActivityListFilterset
 
     def get_queryset(self) -> QuerySet[Activity]:
         return Activity.objects.filter(players=self.request.user.player)
