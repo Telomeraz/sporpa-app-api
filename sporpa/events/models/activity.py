@@ -107,6 +107,10 @@ class Activity(TrackingMixin):
     def organizer(self) -> Player:
         return self.players.get(activity_players__is_organizer=True)
 
+    @property
+    def participants(self) -> models.QuerySet[Player]:
+        return self.players.filter(activity_players__is_organizer=False)
+
     def check_player_limit(
         self,
         *,

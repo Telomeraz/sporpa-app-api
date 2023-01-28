@@ -87,6 +87,14 @@ class TestActivity:
             activities=activity_without_participants,
         )
 
+    def test_participants(self, activity_with_participants: Activity) -> None:
+        assert list(activity_with_participants.participants) == list(
+            Player.objects.filter(
+                activity_players__is_organizer=False,
+                activities=activity_with_participants,
+            ),
+        )
+
     @pytest.mark.parametrize(
         "activity_with_participants",
         [{"player_limit": 10}],
