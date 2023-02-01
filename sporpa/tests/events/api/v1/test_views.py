@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from accounts.models import User
 from events.api.v1.views import (
-    ActivityCreateView,
+    ActivityListCreateView,
     ActivityUpdateView,
     ParticipatedActivityListView,
     ParticipationRequestApprovalView,
@@ -23,7 +23,7 @@ pytestmark = pytest.mark.django_db
 request_factory = APIRequestFactory()
 
 
-class TestActivityCreateView:
+class TestActivityListCreateView:
     def test_create(self, user: User) -> None:
         player_sport: PlayerSport = user.player.sports.first()
         sport: Sport = player_sport.sport
@@ -53,7 +53,7 @@ class TestActivityCreateView:
             data=data,
         )
         force_authenticate(request, user=user)
-        response = ActivityCreateView.as_view()(request)
+        response = ActivityListCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_201_CREATED
         assert response.data["pk"]
@@ -86,7 +86,7 @@ class TestActivityCreateView:
             data=data,
         )
         force_authenticate(request, user=user_without_sport)
-        response = ActivityCreateView.as_view()(request)
+        response = ActivityListCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
@@ -113,7 +113,7 @@ class TestActivityCreateView:
             data=data,
         )
         force_authenticate(request, user=user)
-        response = ActivityCreateView.as_view()(request)
+        response = ActivityListCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_400_BAD_REQUEST
 
@@ -140,9 +140,53 @@ class TestActivityCreateView:
             data=data,
         )
         force_authenticate(request, user=user)
-        response = ActivityCreateView.as_view()(request)
+        response = ActivityListCreateView.as_view()(request)
 
         assert response.status_code == http_status.HTTP_400_BAD_REQUEST
+
+    @pytest.mark.parametrize(
+        "activities_with_participants",
+        [{"total_activities": 5, "total_participants": 3}],
+        indirect=["activities_with_participants"],
+    )
+    def test_list(self, activities_with_participants: Activity) -> None:
+        user = activities_with_participants[0].participants[0].user
+        request = request_factory.get(
+            reverse("events:activities"),
+        )
+        force_authenticate(request, user=user)
+        response = ActivityListCreateView.as_view()(request)
+
+        assert response.status_code == http_status.HTTP_200_OK
+        assert response.data["results"]
+
+        for data, activity in zip(
+            response.data["results"],
+            activities_with_participants[1:],
+        ):
+            organizer = activity.organizer
+            participants = activity.participants
+
+            assert data["pk"] == activity.pk
+            assert data["sport"] == activity.sport.pk
+            assert data["levels"] == list(activity.levels.values_list("pk", flat=True))
+
+            assert data["organizer"]["pk"] == organizer.pk
+            assert data["organizer"]["user"]["first_name"] == organizer.user.first_name
+            assert data["organizer"]["user"]["last_name"] == organizer.user.last_name
+
+            for data_, participant in zip(
+                data["participants"],
+                participants,
+            ):
+                assert data_["pk"] == participant.pk
+                assert data_["user"]["first_name"] == participant.user.first_name
+                assert data_["user"]["last_name"] == participant.user.last_name
+
+            assert data["player_limit"] == activity.player_limit
+            assert data["name"] == activity.name
+            assert data["about"] == activity.about
+            assert data["status"] == activity.status
 
 
 class TestActivityUpdateView:

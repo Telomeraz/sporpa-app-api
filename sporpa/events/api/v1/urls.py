@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 
 from .views import (
-    ActivityCreateView,
+    ActivityListCreateView,
     ActivityUpdateView,
     ParticipatedActivityListView,
     ParticipationRequestApprovalView,
@@ -12,7 +12,7 @@ app_name = "events"
 urlpatterns = [
     path(
         "activities/",
-        ActivityCreateView.as_view(),
+        ActivityListCreateView.as_view(),
         name="activities",
     ),
     path(
