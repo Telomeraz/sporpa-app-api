@@ -77,6 +77,44 @@ class TestActivityManager:
             Activity.objects.create(**data)
 
 
+class TestActivityQueryset:
+    @pytest.mark.parametrize(
+        "activities_with_participants",
+        [{"total_activities": 3, "total_participants": 3}],
+        indirect=["activities_with_participants"],
+    )
+    def test_filter_organizer(self, user: User, activities_with_participants: Activity) -> None:
+        organizer = user.player
+        activities = Activity.objects.filter_organizer(organizer)
+
+        assert activities.count() == 3
+        assert list(activities) == list(activities_with_participants)
+
+    @pytest.mark.parametrize(
+        "activities_with_participants",
+        [{"total_activities": 7, "total_participants": 2}],
+        indirect=["activities_with_participants"],
+    )
+    def test_filter_available(self, activities_with_participants: Activity) -> None:
+        participant = activities_with_participants[0].participants[0]
+        activities = Activity.objects.filter_available(participant)
+
+        assert activities.count() == 6
+        assert list(activities) == list(activities_with_participants[1:])
+
+    @pytest.mark.parametrize(
+        "activities_with_participants",
+        [{"total_activities": 4, "total_participants": 2}],
+        indirect=["activities_with_participants"],
+    )
+    def test_filter_participant(self, activities_with_participants: Activity) -> None:
+        participant = activities_with_participants[0].participants[0]
+        activities = Activity.objects.filter_participant(participant)
+
+        assert activities.count() == 1
+        assert list(activities) == list(activities_with_participants[:1])
+
+
 class TestActivity:
     def test_str(self, activity_without_participants: Activity) -> None:
         assert str(activity_without_participants) == activity_without_participants.name

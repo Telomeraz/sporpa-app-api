@@ -19,10 +19,32 @@ class ActivityManager(TrackingManagerMixin):
         activity.players.add(organizer, through_defaults={"is_organizer": True})
         return activity
 
-    def filter_organizer(self, organizer: Player | int) -> models.QuerySet:
+
+class ActivityQueryset(models.QuerySet):
+    def filter_organizer(self, organizer: Player | int) -> "models.QuerySet[Activity]":
         return self.filter(
             activity_players__is_organizer=True,
             players=organizer,
+        )
+
+    def filter_participant(self, participant: Player | int) -> "models.QuerySet[Activity]":
+        return self.filter(
+            activity_players__is_organizer=False,
+            players=participant,
+        )
+
+    def filter_available(self, participant: Player | int) -> "models.QuerySet[Activity]":
+        return (
+            self.annotate(
+                total_players=models.Count("players"),
+            )
+            .exclude(
+                players=participant,
+            )
+            .filter(
+                status__in=self.model.UPDATABLE_STATUSES,
+                player_limit__gt=models.F("total_players"),
+            )
         )
 
 
@@ -81,7 +103,7 @@ class Activity(TrackingMixin):
         default=Status.OPEN,
     )
 
-    objects = ActivityManager()
+    objects = ActivityManager.from_queryset(ActivityQueryset)()
 
     class Meta:
         db_table = "activity"
