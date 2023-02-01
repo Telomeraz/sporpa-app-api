@@ -17,6 +17,20 @@ fake = Faker()
 pytestmark = pytest.mark.django_db
 
 
+def _activity_with_participants(user: User, data: dict) -> Activity:
+    total_participants = data.pop("total_participants", 1)
+    activity: Activity = ActivityFactory(organizer=user.player, **data)
+    for i in range(total_participants):
+        activity.players.add(
+            UserFactory(
+                player__sports__level=activity.levels.first(),
+                player_sports_size=1,
+                player__sports__sport=activity.sport,
+            ).player,
+        )
+    return activity
+
+
 @pytest.fixture
 def user(request: SubRequest) -> User:
     data = getattr(request, "param", {})
@@ -56,17 +70,7 @@ def activity_without_participants(request: SubRequest, user: User) -> Activity:
 @pytest.fixture
 def activity_with_participants(request: SubRequest, user: User) -> Activity:
     data = getattr(request, "param", {})
-    total_participants = data.pop("total_participants", 1)
-    activity: Activity = ActivityFactory(organizer=user.player, **data)
-    for i in range(total_participants):
-        activity.players.add(
-            UserFactory(
-                player__sports__level=activity.levels.first(),
-                player_sports_size=1,
-                player__sports__sport=activity.sport,
-            ).player,
-        )
-    return activity
+    return _activity_with_participants(user=user, data=data)
 
 
 @pytest.fixture
@@ -80,3 +84,13 @@ def participation_request(activity_without_participants: Activity) -> Participat
         activity=activity_without_participants,
         participant=participant_user.player,
     )
+
+
+@pytest.fixture
+def activities_with_participants(request: SubRequest, user: User) -> Activity:
+    data = getattr(request, "param", {})
+    total_activities = data.pop("total_activities", 1)
+    activities = []
+    for i in range(total_activities):
+        activities.append(_activity_with_participants(user=user, data=data))
+    return activities
