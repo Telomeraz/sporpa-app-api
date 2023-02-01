@@ -126,7 +126,7 @@ class PlayerInnerSerializer(serializers.ModelSerializer):
         )
 
 
-class ParticipatedActivityListSerializer(serializers.ModelSerializer):
+class ActivityListSerializer(serializers.ModelSerializer):
     organizer = PlayerInnerSerializer(read_only=True)
     participants = PlayerInnerSerializer(read_only=True, many=True)
     available_between_at = DateTimeRangeField()

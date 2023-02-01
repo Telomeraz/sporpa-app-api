@@ -9,8 +9,8 @@ from django.urls import reverse
 from accounts.models import User
 from events.api.v1.serializers import (
     ActivityCreateSerializer,
+    ActivityListSerializer,
     ActivityUpdateSerializer,
-    ParticipatedActivityListSerializer,
     ParticipationRequestListSerializer,
 )
 from events.models import Activity
@@ -236,10 +236,10 @@ class TestParticipationRequestListSerializer:
             assert data["level"] == participant_sport.level.pk
 
 
-class TestParticipatedActivityListSerializer:
+class TestActivityListSerializer:
     def test_data(self, activity_with_participants: Activity) -> None:
         activity_with_participants.refresh_from_db()
-        serializer = ParticipatedActivityListSerializer(activity_with_participants)
+        serializer = ActivityListSerializer(activity_with_participants)
 
         organizer = activity_with_participants.organizer
         participants = activity_with_participants.participants
