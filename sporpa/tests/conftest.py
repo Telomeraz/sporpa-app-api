@@ -87,7 +87,7 @@ def participation_request(activity_without_participants: Activity) -> Participat
 
 
 @pytest.fixture
-def activities_with_participants(request: SubRequest, user: User) -> Activity:
+def activities_with_participants(request: SubRequest, user: User) -> list[Activity]:
     data = getattr(request, "param", {})
     total_activities = data.pop("total_activities", 1)
     activities = []

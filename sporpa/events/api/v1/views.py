@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Type
 
 from rest_framework import generics
 from rest_framework import status as http_status
@@ -22,12 +22,12 @@ from .serializers import (
 class ActivityListCreateView(generics.ListCreateAPIView):
     filterset_class = ActivityListFilterset
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[ActivityListSerializer | ActivityCreateSerializer]:
         if self.request.method == "GET":
             return ActivityListSerializer
         return ActivityCreateSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Activity]:
         return Activity.objects.filter_available(self.request.user.player)
 
 

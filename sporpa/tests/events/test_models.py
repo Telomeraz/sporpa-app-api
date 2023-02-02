@@ -83,7 +83,7 @@ class TestActivityQueryset:
         [{"total_activities": 3, "total_participants": 3}],
         indirect=["activities_with_participants"],
     )
-    def test_filter_organizer(self, user: User, activities_with_participants: Activity) -> None:
+    def test_filter_organizer(self, user: User, activities_with_participants: list[Activity]) -> None:
         organizer = user.player
         activities = Activity.objects.filter_organizer(organizer)
 
@@ -95,7 +95,7 @@ class TestActivityQueryset:
         [{"total_activities": 7, "total_participants": 2}],
         indirect=["activities_with_participants"],
     )
-    def test_filter_available(self, activities_with_participants: Activity) -> None:
+    def test_filter_available(self, activities_with_participants: list[Activity]) -> None:
         participant = activities_with_participants[0].participants[0]
         activities = Activity.objects.filter_available(participant)
 
@@ -107,7 +107,7 @@ class TestActivityQueryset:
         [{"total_activities": 4, "total_participants": 2}],
         indirect=["activities_with_participants"],
     )
-    def test_filter_participant(self, activities_with_participants: Activity) -> None:
+    def test_filter_participant(self, activities_with_participants: list[Activity]) -> None:
         participant = activities_with_participants[0].participants[0]
         activities = Activity.objects.filter_participant(participant)
 
@@ -277,3 +277,15 @@ class TestActivity:
         assert not activity.players.contains(participant)
         with pytest.raises(ParticipationRequest.DoesNotExist):
             participation_request.refresh_from_db()
+
+
+class TestActivityLevel:
+    def test_str(self, activity_without_participants: Activity) -> None:
+        activity_level = activity_without_participants.activity_levels.first()
+        assert str(activity_level) == f"{activity_without_participants} - {activity_level.level.get_level_display()}"
+
+
+class TestActivityPlayer:
+    def test_str(self, user: User, activity_without_participants: Activity) -> None:
+        activity_player = activity_without_participants.activity_players.first()
+        assert str(activity_player) == f"{activity_without_participants} - {user.email}"

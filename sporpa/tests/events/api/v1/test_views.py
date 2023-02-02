@@ -149,7 +149,7 @@ class TestActivityListCreateView:
         [{"total_activities": 5, "total_participants": 3}],
         indirect=["activities_with_participants"],
     )
-    def test_list(self, activities_with_participants: Activity) -> None:
+    def test_list(self, activities_with_participants: list[Activity]) -> None:
         user = activities_with_participants[0].participants[0].user
         request = request_factory.get(
             reverse("events:activities"),
