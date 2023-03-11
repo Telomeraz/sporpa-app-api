@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "accounts",
+    "chat",
     "events",
     "participants",
     "utils",
