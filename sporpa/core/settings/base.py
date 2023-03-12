@@ -5,7 +5,7 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ALLOWED_HOSTS: list = []
+ALLOWED_HOSTS = ["*"]
 
 SECRET_KEY = config("SECRET_KEY")
 
@@ -27,6 +27,7 @@ DATABASES = {
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -79,6 +80,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "core.asgi.application"
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -127,6 +130,18 @@ STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+# channels
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # djangorestframework
