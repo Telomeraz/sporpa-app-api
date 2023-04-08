@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from accounts.models import User
 from participants.api.v1.serializers import PlayerSerializer
@@ -18,3 +19,22 @@ class UserRetrieveUpdateSerializer(serializers.ModelSerializer):
             "about",
             "player",
         )
+        extra_kwargs = {
+            "birthdate": {
+                "required": True,
+            },
+        }
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    is_profile_complete = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Token
+        fields = (
+            "key",
+            "is_profile_complete",
+        )
+
+    def get_is_profile_complete(self, obj: Token) -> bool:
+        return obj.user.is_profile_complete

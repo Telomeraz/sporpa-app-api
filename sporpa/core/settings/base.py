@@ -205,3 +205,10 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     },
 }
+
+
+# dj-rest-auth
+
+REST_AUTH = {
+    "TOKEN_SERIALIZER": "accounts.api.v1.serializers.TokenSerializer",
+}

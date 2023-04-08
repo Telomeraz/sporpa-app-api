@@ -150,5 +150,9 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     def has_verified_email_address(self) -> bool:
         return self.emailaddress_set.filter(verified=True).exists()
 
+    @property
+    def is_profile_complete(self) -> bool:
+        return all((self.first_name, self.last_name, self.birthdate))
+
     def email_user(self, subject: str, message: str, from_email: str | None = None, **kwargs: Any) -> int:
         return send_mail(subject, message, from_email, [self.email], **kwargs)
