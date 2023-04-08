@@ -95,7 +95,6 @@ class User(AbstractBaseUser, PermissionsMixin, TrackingMixin):
     avatar = models.ImageField(
         upload_to=user_directory_path,
         blank=True,
-        null=True,
     )
     birthdate = models.DateField(
         _("birthdate"),
